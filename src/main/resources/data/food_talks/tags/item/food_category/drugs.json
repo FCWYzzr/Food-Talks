@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:ominous_bottle",
+    "minecraft:poisonous_potato",
+    "minecraft:rotten_flesh",
+    "minecraft:golden_carrot",
+    "minecraft:golden_apple",
+    "minecraft:enchanted_golden_apple",
+    "minecraft:spider_eye"
+  ]
+}
