@@ -7,6 +7,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(MobEffectInstance.class)
 public interface MobEffectInstanceAccessor extends Comparable<MobEffectInstance> {
     
-    @Accessor(value = "hiddenEffect", remap = false)
+    @Accessor(value = "hiddenEffect")
     MobEffectInstance getHiddenEffect();
 }

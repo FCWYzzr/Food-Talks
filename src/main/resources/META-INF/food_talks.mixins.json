@@ -5,7 +5,6 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "food_talks.refmap.json",
   "mixins": [
-    "accessors.LivingEntityAccessor",
     "tweaks.item.BottleBlockItem",
     "accessors.MobEffectInstanceAccessor"
   ],

@@ -82,6 +82,7 @@ class BottleBlockEntity(
         super.loadAdditional(tag, registries)
         contents.clear()
 
+        waterLevel = tag.getInt("water_level")
         detoxified = tag.getBoolean("detoxified")
         upgrade = tag.getInt("upgrade")
         extend = tag.getInt("extend")
@@ -116,6 +117,7 @@ class BottleBlockEntity(
                 .forEach(::add)
         }
 
+        tag.putInt("water_level", waterLevel)
         tag.putInt("upgrade", upgrade)
         tag.putBoolean("detoxified", detoxified)
         tag.put("contents", contentTag)
