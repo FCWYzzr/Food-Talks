@@ -11,7 +11,6 @@ import net.minecraft.util.RandomSource
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.item.alchemy.PotionContents
 import net.neoforged.fml.common.Mod
-import net.neoforged.neoforge.registries.DeferredRegister
 import org.slf4j.Logger
 import thedarkcolour.kotlinforforge.neoforge.forge.FORGE_BUS
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS

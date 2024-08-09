@@ -1,7 +1,6 @@
 package indi.fcwyzzr.minecraft.food_talks.common.event.gameplay
 
 import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
-import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodItemProperties
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Tick
 
