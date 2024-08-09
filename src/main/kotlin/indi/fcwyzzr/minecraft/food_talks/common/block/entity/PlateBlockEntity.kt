@@ -15,6 +15,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
+import net.neoforged.neoforge.common.Tags
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.RegisterEvent
 
