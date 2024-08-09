@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.phys.shapes.CollisionContext;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -39,8 +38,8 @@ public class BottleBlockItem extends Item {
     public InteractionResult useOn(@Nonnull UseOnContext pContext) {
         InteractionResult interactionresult = this.place_mixin(new BlockPlaceContext(pContext));
         if (!interactionresult.consumesAction() && pContext.getItemInHand().has(DataComponents.FOOD)) {
-            InteractionResult interactionresult1 = super.use(pContext.getLevel(), pContext.getPlayer(), pContext.getHand()).getResult();
-            return interactionresult1 == InteractionResult.CONSUME ? InteractionResult.CONSUME_PARTIAL : interactionresult1;
+            InteractionResult interactionResult1 = super.use(pContext.getLevel(), pContext.getPlayer(), pContext.getHand()).getResult();
+            return interactionResult1 == InteractionResult.CONSUME ? InteractionResult.CONSUME_PARTIAL : interactionResult1;
         } else {
             return interactionresult;
         }
@@ -88,20 +87,6 @@ public class BottleBlockItem extends Item {
     private SoundEvent getPlaceSound_mixin(BlockState state, Level world, BlockPos pos, Player entity) {
         var glass = Blocks.GLASS;
         return glass.getSoundType(glass.defaultBlockState(), world, pos, entity).getPlaceSound();
-    }
-    
-    
-    @Unique
-    private boolean canPlace_mixin(BlockPlaceContext pContext, BlockState pState) {
-        Player player = pContext.getPlayer();
-        CollisionContext collisioncontext = player == null ? CollisionContext.empty() : CollisionContext.of(player);
-        return (!this.mustSurvive_mixin() || pState.canSurvive(pContext.getLevel(), pContext.getClickedPos()))
-            && pContext.getLevel().isUnobstructed(pState, pContext.getClickedPos(), collisioncontext);
-    }
-    
-    @Unique
-    private boolean mustSurvive_mixin() {
-        return true;
     }
     
     @Unique
