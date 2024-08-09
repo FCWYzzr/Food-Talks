@@ -5,7 +5,6 @@ import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
 import indi.fcwyzzr.minecraft.food_talks.common.block.entity.BottleBlockEntity
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodStackProperties
-import indi.fcwyzzr.minecraft.food_talks.common.mixin.accessors.LivingEntityAccessor
 import indi.fcwyzzr.minecraft.food_talks.common.mixin.accessors.MobEffectInstanceAccessor
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
@@ -43,10 +42,7 @@ object Cocktail: CompoundFood(
             ?: return true
 
         removalWhenMergeMobEffectMap(addonEffectMap, baseEffectMap)
-            .forEach {
-                val mobEffectInstance: MobEffectInstance? = entity.removeEffectNoUpdate(it)
-                (entity as LivingEntityAccessor).onEffectRemoved(mobEffectInstance)
-            }
+            .forEach(entity::removeEffect)
 
         computedAddonMobEffect(addonEffectMap, baseEffectMap)
             .forEach {
