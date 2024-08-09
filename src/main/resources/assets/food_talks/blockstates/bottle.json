@@ -1,0 +1,31 @@
+{
+  "variants": {
+    "fill_level=0": {
+      "model": "food_talks:block/bottle/bottle_0"
+    },
+    "fill_level=1": {
+      "model": "food_talks:block/bottle/bottle_1"
+    },
+    "fill_level=2": {
+      "model": "food_talks:block/bottle/bottle_2"
+    },
+    "fill_level=3": {
+      "model": "food_talks:block/bottle/bottle_3"
+    },
+    "fill_level=4": {
+      "model": "food_talks:block/bottle/bottle_4"
+    },
+    "fill_level=5": {
+      "model": "food_talks:block/bottle/bottle_5"
+    },
+    "fill_level=6": {
+      "model": "food_talks:block/bottle/bottle_6"
+    },
+    "fill_level=7": {
+      "model": "food_talks:block/bottle/bottle_7"
+    },
+    "fill_level=8": {
+      "model": "food_talks:block/bottle/bottle_8"
+    }
+  }
+}
