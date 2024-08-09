@@ -10,10 +10,4 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface LivingEntityAccessor{
     @Invoker(value = "onEffectRemoved", remap = false)
     void onEffectRemoved(MobEffectInstance pEffectInstance);
-    
-    @Accessor(value = "useItemRemaining")
-    int getUseItemRemaining();
-    
-    @Accessor(value = "useItemRemaining")
-    void setUseItemRemaining(int v);
 }

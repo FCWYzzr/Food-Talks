@@ -11,6 +11,6 @@ object FleshesMakeYouVomit: FoodTagPunishment(
 ) {
     private const val BASE_TIME = FoodTalks.TPS * 2
 
-    override fun extendTime(punishLevel: Int): Int = punishLevel
+    override fun extendTime(punishLevel: Int): Int = punishLevel * BASE_TIME
     override fun amplifier(punishLevel: Int) = 1
 }

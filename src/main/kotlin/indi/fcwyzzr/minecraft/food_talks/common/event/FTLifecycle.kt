@@ -15,10 +15,8 @@ import indi.fcwyzzr.minecraft.food_talks.common.item.Cocktail
 import indi.fcwyzzr.minecraft.food_talks.common.item.Plate
 import indi.fcwyzzr.minecraft.food_talks.common.registries.foodItemRewardRegistry
 import indi.fcwyzzr.minecraft.food_talks.common.registries.foodTagPunishmentRegistry
-import indi.fcwyzzr.minecraft.food_talks.common.registries.liquorKey
 import indi.fcwyzzr.minecraft.food_talks.toResourceLocation
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.world.item.alchemy.Potion
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.neoforge.registries.NewRegistryEvent
 import net.neoforged.neoforge.registries.RegisterEvent
@@ -57,13 +55,6 @@ object FTLifecycle {
         event doRegister Toothache
         event doRegister Vomit
         event doRegister Overweight
-    }
-
-    @SubscribeEvent
-    fun registerPotions(event: RegisterEvent){
-        event.register(BuiltInRegistries.POTION.key()){
-            it.register(liquorKey, Potion("liquor"))
-        }
     }
 
     @SubscribeEvent
