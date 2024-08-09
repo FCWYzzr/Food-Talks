@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(LivingEntity.class)
-interface LivingEntityAccessor{
+public interface LivingEntityAccessor{
     @Invoker(value = "onEffectRemoved", remap = false)
     void onEffectRemoved(MobEffectInstance pEffectInstance);
     
