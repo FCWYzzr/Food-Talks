@@ -1,9 +1,17 @@
 package indi.fcwyzzr.minecraft.food_talks.common.event.gameplay
 
+import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
+import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Tick
 
+@EventBusSubscriber(
+    modid = FoodTalks.MOD_ID,
+    value = [Dist.CLIENT, Dist.DEDICATED_SERVER],
+    bus = EventBusSubscriber.Bus.GAME
+)
 object CompoundFoodEatingHandler {
     @SubscribeEvent
     fun tickEating(tick: Tick){
