@@ -19,8 +19,8 @@ import net.minecraft.world.level.Level
 import java.util.*
 
 abstract class CompoundFood(
-    bitesNeed: Int,
     chewSeconds: Float,
+    bitesNeed: Int = 1,
     useConvertsTo: ItemStack? = null,
     canAlwaysEat: Boolean = false
 ): FItem(Properties().apply {

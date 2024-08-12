@@ -54,10 +54,6 @@ public record FoodItemProperties(
     
     public static final ResourceLocation location = toResourceLocation(name);
     
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<FoodItemProperties>> holder = DeferredHolder.create(
-        BuiltInRegistries.DATA_COMPONENT_TYPE.key(), location
-    );
-    
     public static DataComponentType<FoodItemProperties> type = DataComponentType
         .<FoodItemProperties>builder()
         .persistent(codec)

@@ -4,8 +4,7 @@ import indi.fcwyzzr.minecraft.f_lib.utils.buildComponent
 import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
 import indi.fcwyzzr.minecraft.food_talks.common.block.entity.BottleBlockEntity
-import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodStackProperties
-import indi.fcwyzzr.minecraft.food_talks.common.mixin.accessors.MobEffectInstanceAccessor
+import indi.fcwyzzr.minecraft.food_talks.common.mixin.accessors.mechanic.MobEffectInstanceAccessor
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.contents.PlainTextContents.LiteralContents
@@ -23,8 +22,8 @@ import java.time.Duration
 import java.util.*
 
 object Cocktail: CompoundFood(
-    16,
-    1F,
+    0.25F,
+    1,
     Items.GLASS_BOTTLE.defaultInstance,
     true
 ) {
@@ -56,7 +55,6 @@ object Cocktail: CompoundFood(
         if (fillLevel == 0)
             return Items.GLASS_BOTTLE.defaultInstance
 
-        val damage = (8 - fillLevel) * 2
         val amplifierAddon = entity.upgrade
         val timeMultiplier = entity.extend
         val harmFilter = entity.detoxified
@@ -73,7 +71,7 @@ object Cocktail: CompoundFood(
                 if (timeMultiplier == 0 && amplifierAddon == 0)
                     it
                 else {
-                val time = it.duration * (timeMultiplier + 1) / 4
+                val time = it.duration * (timeMultiplier + 1) / 16
                     val amplifier = it.amplifier + amplifierAddon
                     MobEffectInstance(it.effect, time, amplifier)
                 }
@@ -84,6 +82,10 @@ object Cocktail: CompoundFood(
 
         return  buildItemStack {
             set(
+                DataComponents.MAX_DAMAGE,
+                fillLevel * 8
+            )
+            set(
                 DataComponents.POTION_CONTENTS,
                 PotionContents(
                     Optional.empty(),
@@ -91,16 +93,10 @@ object Cocktail: CompoundFood(
                     potionContents
                 )
             )
-            set(
-                FoodStackProperties.type,
-                FoodStackProperties(
-                    1, 0.5F
-                )
-            )
 
             set(
                 DataComponents.DAMAGE,
-                damage
+                0
             )
 
             set(
