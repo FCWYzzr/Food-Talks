@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.BlockState
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.RegisterEvent
 import org.slf4j.Logger
+import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 
 class BottleBlockEntity(
@@ -40,6 +41,7 @@ class BottleBlockEntity(
     private val contents = mutableMapOf<Holder<MobEffect>, MobEffectInstance>()
 
     fun addPotion(effects: Collection<MobEffectInstance>){
+        setChanged()
         waterLevel ++
         effects
             .asSequence()
@@ -62,16 +64,18 @@ class BottleBlockEntity(
 
     fun upgrade(){
         upgrade ++
+        setChanged()
     }
 
     fun extend(){
         extend ++
+        setChanged()
     }
 
     fun detoxify(): Boolean{
         if (detoxified)
             return false
-
+        setChanged()
         detoxified = true
         return true
     }
@@ -96,9 +100,7 @@ class BottleBlockEntity(
                 ).resultOrPartial { name ->
                     LOGGER.error("Tried to load invalid item: '{}'", name)
                 }
-            }.mapNotNull {
-                it.getOrNull()
-            }
+            }.mapNotNull(Optional<MobEffectInstance>::getOrNull)
             .forEach{
                 contents[it.effect] = it
             }

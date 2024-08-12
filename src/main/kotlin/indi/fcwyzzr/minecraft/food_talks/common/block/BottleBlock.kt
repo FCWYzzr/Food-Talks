@@ -14,6 +14,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.ItemInteractionResult
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
@@ -37,7 +38,7 @@ import thedarkcolour.kotlinforforge.neoforge.forge.vectorutil.v3d.toVec3
 class BottleBlock private constructor(): Block(Properties.of().apply {
     instabreak()
     explosionResistance(0F)
-    // noTerrainParticles()
+    noTerrainParticles()
     sound(SoundType.GLASS)
     noCollission()
     noOcclusion()
@@ -122,9 +123,32 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
 
     private fun doDestroyDrop(level: Level, entity: BottleBlockEntity, fillLevel: Int){
         val itemStack = Cocktail.buildFromBottle(entity, fillLevel)
-        val spawnPos = entity.blockPos.toVec3()
-        val itemEntity = ItemEntity(level, spawnPos.x, spawnPos.y, spawnPos.z, itemStack)
-        level.addFreshEntity(itemEntity)
+        popResource(level, entity.blockPos, itemStack)
+    }
+
+    /**
+     * shift click take
+     */
+    override fun useWithoutItem(
+        state: BlockState,
+        level: Level,
+        pos: BlockPos,
+        player: Player,
+        hitResult: BlockHitResult
+    ): InteractionResult {
+        if (! player.isShiftKeyDown)
+            return InteractionResult.PASS
+
+        doDestroyDrop(
+            level,
+            level.getBlockEntity(pos) as BottleBlockEntity,
+            state.getValue(PROPERTY_FILL_LEVEL)
+        )
+
+        if (!player.hasInfiniteMaterials())
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState())
+
+        return InteractionResult.SUCCESS
     }
 
     override fun useItemOn(
@@ -149,51 +173,49 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
         val fillLevel = state.getValue(PROPERTY_FILL_LEVEL)
         val entity = level.getBlockEntity(pos) as BottleBlockEntity
 
-        val result = when{
+        val (result, newState) = when{
             stack.`is`(Items.HONEY_BOTTLE) -> {
                 if (fillLevel == MAX_FILL_LEVEL)
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
                 else if (!entity.allowNewCondiment(2))
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
                 else if (! entity.detoxify()) {
                     val newState = state.setValue(PROPERTY_FILL_LEVEL, fillLevel+1)
-                    level.setBlockAndUpdate(pos, newState)
                     if (!player.hasInfiniteMaterials())
                         player.setItemInHand(hand, Items.GLASS_BOTTLE.defaultInstance)
-                    ItemInteractionResult.SUCCESS
+                    ItemInteractionResult.SUCCESS to newState
                 }
                 else
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
             }
 
             stack.`is`(Items.GLOWSTONE_DUST) -> {
                 if (!entity.allowNewCondiment(1))
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
                 else{
                     entity.upgrade()
                     if (!player.hasInfiniteMaterials())
                         player.setItemInHand(hand, ItemStack.EMPTY)
-                    ItemInteractionResult.SUCCESS
+                    ItemInteractionResult.SUCCESS to state
                 }
             }
 
             stack.`is`(Items.REDSTONE) -> {
                 if (!entity.allowNewCondiment(1))
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
                 else{
                     entity.extend()
                     if (!player.hasInfiniteMaterials())
                         player.setItemInHand(hand, ItemStack.EMPTY)
-                    ItemInteractionResult.SUCCESS
+                    ItemInteractionResult.SUCCESS to state
                 }
             }
 
             else -> {
                 if (fillLevel == MAX_FILL_LEVEL)
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
                 else {
                     val newState = state.setValue(PROPERTY_FILL_LEVEL, fillLevel+1)
-                    level.setBlockAndUpdate(pos, newState)
 
                     entity.addPotion((stack
                         .components[DataComponents.POTION_CONTENTS]
@@ -202,10 +224,13 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
 
                     if (!player.hasInfiniteMaterials())
                         player.setItemInHand(hand, Items.GLASS_BOTTLE.defaultInstance)
-                    ItemInteractionResult.SUCCESS
+                    ItemInteractionResult.SUCCESS to newState
                 }
             }
         }
+
+        if (newState !== null)
+            level.setBlockAndUpdate(pos, newState)
 
         return result
     }
