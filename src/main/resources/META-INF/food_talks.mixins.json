@@ -5,8 +5,11 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "food_talks.refmap.json",
   "mixins": [
+    "accessors.mechanic.MobEffectInstanceAccessor",
     "tweaks.item.BottleBlockItem",
-    "accessors.MobEffectInstanceAccessor"
+    "tweaks.mechanic.FoodDataMixin",
+    "tweaks.mechanic.LivingEntityMixin",
+    "tweaks.mechanic.PathfinderMobMixin"
   ],
   "client": [
   ],
