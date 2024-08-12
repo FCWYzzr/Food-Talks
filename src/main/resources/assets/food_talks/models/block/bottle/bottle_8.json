@@ -5,7 +5,8 @@
 	"textures": {
 		"0": "food_talks:block/bottle/bottle",
 		"1": "food_talks:block/bottle/content",
-		"2": "food_talks:block/bottle/cork"
+		"2": "food_talks:block/bottle/cork",
+		"particle": "food_talks:block/bottle/bottle"
 	},
 	"elements": [
 		{
