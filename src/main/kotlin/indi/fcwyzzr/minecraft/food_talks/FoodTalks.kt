@@ -27,11 +27,6 @@ object FoodTalks {
 
     init {
         lifeCycleLogger.info("initialize for mod $MOD_ID")
-
-        MOD_BUS.register(FTLifecycle)
-
-        FORGE_BUS.register(EffectHandler)
-         FORGE_BUS.register(CompoundFoodEatingHandler)
     }
 }
 
