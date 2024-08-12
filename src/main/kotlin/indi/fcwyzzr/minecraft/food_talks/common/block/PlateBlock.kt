@@ -3,6 +3,7 @@ package indi.fcwyzzr.minecraft.food_talks.common.block
 import indi.fcwyzzr.minecraft.f_lib.registry.FRegistry
 import indi.fcwyzzr.minecraft.food_talks.common.block.entity.PlateBlockEntity
 import indi.fcwyzzr.minecraft.food_talks.common.item.Plate
+import indi.fcwyzzr.minecraft.food_talks.common.item.Sandwich
 import indi.fcwyzzr.minecraft.food_talks.toRegistryName
 import indi.fcwyzzr.minecraft.food_talks.toResourceLocation
 import net.minecraft.core.BlockPos
@@ -13,6 +14,7 @@ import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.ItemInteractionResult
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
@@ -81,6 +83,40 @@ class PlateBlock private constructor(): Block(Properties.of().apply {
             )
     }
 
+    override fun useWithoutItem(
+        state: BlockState,
+        level: Level,
+        pos: BlockPos,
+        player: Player,
+        hitResult: BlockHitResult
+    ): InteractionResult {
+        val entity = level.getBlockEntity(pos) as PlateBlockEntity
+        if (player.isShiftKeyDown){
+            if (!player.hasInfiniteMaterials() && level.gameRules.getBoolean(GameRules.RULE_DOBLOCKDROPS))
+                doIngredientsDrop(level, pos, false)
+            else
+                entity.clear()
+
+
+            return InteractionResult.SUCCESS
+        }
+
+        if (entity.lastCover == null)
+            return InteractionResult.PASS
+
+        val stack = Sandwich.assemblyFromPlate(entity)
+
+        if (!player.hasInfiniteMaterials())
+            entity.clear()
+
+        level.addFreshEntity(ItemEntity(
+            level,
+            pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(),
+            stack
+        ))
+        return InteractionResult.SUCCESS
+    }
+
 
     override fun useItemOn(
         stack: ItemStack,
@@ -93,14 +129,16 @@ class PlateBlock private constructor(): Block(Properties.of().apply {
     ): ItemInteractionResult {
         val entity = level.getBlockEntity(pos) as PlateBlockEntity
 
-        return if (!entity.addLayer(stack))
+        return if (!entity.putItem(stack))
             ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
         else {
             // level.playSound() TODO
-            player.setItemInHand(
-                hand,
-                stack.apply { shrink(1) }
-            )
+
+            if (!player.hasInfiniteMaterials())
+                player.setItemInHand(
+                    hand,
+                    stack.apply { shrink(1) }
+                )
 
             ItemInteractionResult.SUCCESS
         }
@@ -147,35 +185,41 @@ class PlateBlock private constructor(): Block(Properties.of().apply {
         val entity = level.getBlockEntity(pos) as PlateBlockEntity
 
         if (dropSelf)
-            level.addFreshEntity(ItemEntity(
-                level,
-                pos.x.toDouble(),
-                pos.y.toDouble(),
-                pos.z.toDouble(),
-                Plate.defaultInstance
-            ))
+            popResource(level, pos, ItemStack(instance))
 
-        entity.ingredient
-            .fold(mutableMapOf<Item, MutableMap<DataComponentMap, ItemStack>>()) { map, itemStack ->
-                if (itemStack.item !in map) {
-                    map[itemStack.item] = mutableMapOf(itemStack.components to itemStack)
-                    return@fold map
-                }
 
-                val itemSet = map[itemStack.item]!!
-                if (itemStack.components !in itemSet) {
-                    itemSet[itemStack.components] = itemStack
-                    return@fold map
-                }
-
-                itemSet[itemStack.components]!!.grow(itemStack.count)
-
-                map
+        entity
+            .popDisplay()
+            ?.apply{
+                popResource(level, pos, this)
             }
-            .flatMap { it.value.values }
-            .asSequence()
-            .map { ItemEntity(level, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), it) }
-            .forEach(level::addFreshEntity)
+            ?: run {
+                entity
+                    .readOnlyIngredient
+                    .fold(mutableMapOf<Item, MutableMap<DataComponentMap, ItemStack>>()) { map, itemStack ->
+                        if (itemStack.item !in map) {
+                            map[itemStack.item] = mutableMapOf(itemStack.components to itemStack)
+                            return@fold map
+                        }
+
+                        val itemSet = map[itemStack.item]!!
+                        if (itemStack.components !in itemSet) {
+                            itemSet[itemStack.components] = itemStack
+                            return@fold map
+                        }
+
+                        itemSet[itemStack.components]!!.grow(itemStack.count)
+
+                        map
+                    }
+                    .flatMap { it.value.values }
+                    .asSequence()
+                    .forEach{
+                        popResource(level, pos, it)
+                    }
+
+                entity.clear()
+            }
     }
 
 
