@@ -3,7 +3,6 @@ package indi.fcwyzzr.minecraft.food_talks.common.block.entity
 import com.mojang.logging.LogUtils
 import indi.fcwyzzr.minecraft.f_lib.registry.FRegistry
 import indi.fcwyzzr.minecraft.food_talks.common.block.PlateBlock
-import indi.fcwyzzr.minecraft.food_talks.common.block.entity.BottleBlockEntity.Companion
 import indi.fcwyzzr.minecraft.food_talks.common.registries.sandwichCover
 import indi.fcwyzzr.minecraft.food_talks.toRegistryName
 import indi.fcwyzzr.minecraft.food_talks.toResourceLocation
@@ -16,11 +15,15 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.NbtOps
+import net.minecraft.network.Connection
+import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientGamePacketListener
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
 import net.minecraft.resources.ResourceKey
-import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.RegisterEvent
@@ -33,16 +36,25 @@ class PlateBlockEntity(
     state: BlockState
 ): BlockEntity(type, pos, state) {
     val readOnlyIngredient: List<ItemStack> get() = ingredient
+    val displayItem: ItemStack? get() = display
+    private val ingredient = mutableListOf<ItemStack>()
+    private var display: ItemStack? = null
 
-    val ingredient = mutableListOf<ItemStack>()
+
     val size get() = ingredient.size
 
     val frontCover: ItemStack? get() = ingredient.getOrNull(0)
     val lastCover: ItemStack? get(){
-        return if (ingredient.size < 2 || ingredient.last().`is`(sandwichCover))
+        return if (ingredient.size < 2 || !ingredient.last().`is`(sandwichCover))
             null
         else
             ingredient.last()
+    }
+
+    fun clear(){
+        display = null
+        ingredient.clear()
+        setChanged()
     }
 
     private fun addCover(itemStack: ItemStack): Boolean{
@@ -50,41 +62,91 @@ class PlateBlockEntity(
             return false
 
         ingredient.addLast(itemStack)
+        setChanged()
         return true
     }
 
-    fun addLayer(itemStack: ItemStack): Boolean {
+    fun putItem(itemStack: ItemStack): Boolean {
+        if (display != null)
+            return false
         if (size == MAX_LAYER)
             return false
         if (itemStack.components[DataComponents.FOOD] == null)
             return false
 
+        // todo
+        if (itemStack.components[DataComponents.FOOD]!!.usingConvertsTo.isPresent)
+            return false
+
         if (size == 0 || size == MAX_LAYER - 1)
             return addCover(itemStack.copyWithCount(1))
+                    || pushDisplay(itemStack.copyWithCount(1))
 
         ingredient.addLast(itemStack.copyWithCount(1))
+        setChanged()
         return true
     }
+
+    private fun pushDisplay(itemStack: ItemStack): Boolean {
+        if (size != 0)
+            return false
+        if (display != null)
+            return false
+
+        display = itemStack
+        setChanged()
+        return true
+    }
+    fun popDisplay(): ItemStack? {
+        val pop = display
+        display = null
+        setChanged()
+        return pop
+    }
+
 
     override fun loadAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
         super.loadAdditional(tag, registries)
         ingredient.clear()
 
-        tag.getList("ingredients", 10)
-            .asSequence()
-            .map {
-                ItemStack.CODEC.parse(
+        tag.get("display")
+            ?.apply {
+                val displayItem = ItemStack.SINGLE_ITEM_CODEC.parse(
                     registries.createSerializationContext(NbtOps.INSTANCE),
-                    it
+                    this
                 ).resultOrPartial { name ->
-                    LOGGER.error("Tried to load invalid item: '{}'", name)
+                    LOGGER.error("Tried to load invalid display item: '{}'", name)
                 }
-            }.mapNotNull(Optional<ItemStack>::getOrNull)
-            .forEach(ingredient::add)
+                display = displayItem.getOrNull()
+            }
+            ?: tag.getList("ingredients", 10)
+                .asSequence()
+                .map {
+                    ItemStack.CODEC.parse(
+                        registries.createSerializationContext(NbtOps.INSTANCE),
+                        it
+                    ).resultOrPartial { name ->
+                        LOGGER.error("Tried to load invalid ingredient: '{}'", name)
+                    }
+                }.mapNotNull(Optional<ItemStack>::getOrNull)
+                .forEach(ingredient::add)
+
+
     }
 
     override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
         super.saveAdditional(tag, registries)
+
+        if (display != null){
+            tag.put("display",
+                ItemStack.CODEC.encodeStart(
+                    registries.createSerializationContext(NbtOps.INSTANCE),
+                    display
+                ).getOrThrow()
+            )
+            return
+        }
+
         val contentTag = ListTag().apply {
             ingredient
                 .asSequence()
@@ -98,7 +160,16 @@ class PlateBlockEntity(
         }
 
         tag.put("ingredients", contentTag)
+    }
 
+
+    override fun getUpdatePacket(): Packet<ClientGamePacketListener> =
+        ClientboundBlockEntityDataPacket.create(this)
+
+    override fun getUpdateTag(registries: HolderLookup.Provider): CompoundTag {
+        val tag = CompoundTag()
+        saveAdditional(tag, registries)
+        return tag
     }
 
 
