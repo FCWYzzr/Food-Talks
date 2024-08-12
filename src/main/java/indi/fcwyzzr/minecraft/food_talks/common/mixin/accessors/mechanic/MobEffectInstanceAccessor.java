@@ -1,4 +1,4 @@
-package indi.fcwyzzr.minecraft.food_talks.common.mixin.accessors;
+package indi.fcwyzzr.minecraft.food_talks.common.mixin.accessors.mechanic;
 
 import net.minecraft.world.effect.MobEffectInstance;
 import org.spongepowered.asm.mixin.Mixin;
