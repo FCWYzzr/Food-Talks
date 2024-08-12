@@ -1,4 +1,4 @@
-package indi.fcwyzzr.minecraft.food_talks.common.effects
+package indi.fcwyzzr.minecraft.food_talks.common.effects.harmful
 
 import indi.fcwyzzr.minecraft.f_lib.registry.FMobEffect
 import net.minecraft.world.Difficulty
