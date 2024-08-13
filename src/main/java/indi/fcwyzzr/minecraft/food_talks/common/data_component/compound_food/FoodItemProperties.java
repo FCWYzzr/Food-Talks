@@ -3,13 +3,11 @@ package indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.Optional;
 
@@ -54,7 +52,7 @@ public record FoodItemProperties(
     
     public static final ResourceLocation location = toResourceLocation(name);
     
-    public static DataComponentType<FoodItemProperties> type = DataComponentType
+    public static final DataComponentType<FoodItemProperties> type = DataComponentType
         .<FoodItemProperties>builder()
         .persistent(codec)
         .networkSynchronized(streamCodec)

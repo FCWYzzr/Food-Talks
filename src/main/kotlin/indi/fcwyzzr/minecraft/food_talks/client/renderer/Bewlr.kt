@@ -14,7 +14,6 @@ object Bewlr: BlockEntityWithoutLevelRenderer(
     Minecraft.getInstance().blockEntityRenderDispatcher,
     Minecraft.getInstance().entityModels
 ) {
-    private val renderDispatcher = Minecraft.getInstance().blockEntityRenderDispatcher
 
     override fun renderByItem(
         stack: ItemStack,

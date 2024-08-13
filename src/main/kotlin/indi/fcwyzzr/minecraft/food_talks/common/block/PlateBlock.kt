@@ -2,7 +2,6 @@ package indi.fcwyzzr.minecraft.food_talks.common.block
 
 import indi.fcwyzzr.minecraft.f_lib.registry.FRegistry
 import indi.fcwyzzr.minecraft.food_talks.common.block.entity.PlateBlockEntity
-import indi.fcwyzzr.minecraft.food_talks.common.item.Plate
 import indi.fcwyzzr.minecraft.food_talks.common.item.Sandwich
 import indi.fcwyzzr.minecraft.food_talks.toRegistryName
 import indi.fcwyzzr.minecraft.food_talks.toResourceLocation
@@ -38,7 +37,6 @@ import net.neoforged.neoforge.registries.RegisterEvent
 class PlateBlock private constructor(): Block(Properties.of().apply {
     instabreak()
     explosionResistance(0F)
-    // noTerrainParticles()
     sound(SoundType.WOOD)
     noCollission()
     noOcclusion()

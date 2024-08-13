@@ -40,7 +40,7 @@ public record FoodStackProperties(
     
     public static final ResourceLocation location = toResourceLocation(name);
     
-    public static DataComponentType<FoodStackProperties> type = DataComponentType
+    public static final DataComponentType<FoodStackProperties> type = DataComponentType
         .<FoodStackProperties>builder()
         .persistent(codec)
         .networkSynchronized(streamCodec)

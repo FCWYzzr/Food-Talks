@@ -4,15 +4,12 @@ import indi.fcwyzzr.minecraft.f_lib.registry.FItem
 import indi.fcwyzzr.minecraft.f_lib.utils.buildDataComponentPatch
 import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodItemProperties
-import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodStackProperties
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponentPatch
-import net.minecraft.core.component.DataComponents
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResultHolder
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.food.FoodProperties
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.UseAnim
 import net.minecraft.world.level.Level

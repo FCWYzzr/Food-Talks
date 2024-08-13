@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 
 /**
@@ -38,7 +39,7 @@ public class BottleBlockItem extends Item {
     public InteractionResult useOn(@Nonnull UseOnContext pContext) {
         InteractionResult interactionresult = this.place_mixin(new BlockPlaceContext(pContext));
         if (!interactionresult.consumesAction() && pContext.getItemInHand().has(DataComponents.FOOD)) {
-            InteractionResult interactionResult1 = super.use(pContext.getLevel(), pContext.getPlayer(), pContext.getHand()).getResult();
+            InteractionResult interactionResult1 = super.use(pContext.getLevel(), Objects.requireNonNull(pContext.getPlayer()), pContext.getHand()).getResult();
             return interactionResult1 == InteractionResult.CONSUME ? InteractionResult.CONSUME_PARTIAL : interactionResult1;
         } else {
             return interactionresult;
@@ -72,7 +73,7 @@ public class BottleBlockItem extends Item {
         level.playSound(
             player,
             blockpos,
-            this.getPlaceSound_mixin(currentState, level, blockpos, context.getPlayer()),
+            this.getPlaceSound_mixin(level, blockpos, context.getPlayer()),
             SoundSource.BLOCKS,
             (soundtype.getVolume() + 1.0F) / 2.0F,
             soundtype.getPitch() * 0.8F
@@ -84,7 +85,7 @@ public class BottleBlockItem extends Item {
     
 
     @Unique
-    private SoundEvent getPlaceSound_mixin(BlockState state, Level world, BlockPos pos, Player entity) {
+    private SoundEvent getPlaceSound_mixin(Level world, BlockPos pos, Player entity) {
         var glass = Blocks.GLASS;
         return glass.getSoundType(glass.defaultBlockState(), world, pos, entity).getPlaceSound();
     }

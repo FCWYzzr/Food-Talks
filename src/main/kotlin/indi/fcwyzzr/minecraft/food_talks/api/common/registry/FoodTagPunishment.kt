@@ -2,8 +2,6 @@ package indi.fcwyzzr.minecraft.food_talks.api.common.registry
 
 import indi.fcwyzzr.minecraft.f_lib.registry.FRegistry
 import indi.fcwyzzr.minecraft.food_talks.common.registries.foodTagPunishmentKey
-import indi.fcwyzzr.minecraft.food_talks.toRegistryName
-import indi.fcwyzzr.minecraft.food_talks.toResourceLocation
 import net.minecraft.core.Holder
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation

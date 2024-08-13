@@ -1,7 +1,6 @@
 package indi.fcwyzzr.minecraft.food_talks.common.data_component;
 
 import com.mojang.serialization.Codec;
-import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodItemProperties;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentType;
@@ -9,7 +8,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;

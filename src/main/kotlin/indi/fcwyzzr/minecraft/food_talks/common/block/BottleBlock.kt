@@ -16,13 +16,15 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.ItemInteractionResult
-import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.level.*
-import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.EntityBlock
+import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.IntegerProperty
@@ -33,12 +35,10 @@ import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.RegisterEvent
-import thedarkcolour.kotlinforforge.neoforge.forge.vectorutil.v3d.toVec3
 
 class BottleBlock private constructor(): Block(Properties.of().apply {
     instabreak()
     explosionResistance(0F)
-    noTerrainParticles()
     sound(SoundType.GLASS)
     noCollission()
     noOcclusion()
