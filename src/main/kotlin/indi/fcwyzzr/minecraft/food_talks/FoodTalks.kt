@@ -58,7 +58,13 @@ fun <T> ResourceLocation.toRegistryKey(): ResourceKey<Registry<T>> =
 fun <T> ResourceLocation.toResourceKeyOf(registry: ResourceKey<Registry<T>>): ResourceKey<T> =
     ResourceKey.create(registry, this)
 
-fun PotionContents.toMobEffectInstanceList(): List<MobEffectInstance> = buildList {
-    addAll(customEffects)
-    addAll(potion.get().value().effects)
+fun PotionContents.toMobEffectInstanceSequence() = sequence{
+    yieldAll(customEffects)
+    yieldAll(potion.get().value().effects)
 }
+
+fun <T> PotionContents.toMobEffectInstanceList(
+    mapper: (MobEffectInstance) -> T
+): List<T> = toMobEffectInstanceSequence()
+    .map(mapper)
+    .toList()
