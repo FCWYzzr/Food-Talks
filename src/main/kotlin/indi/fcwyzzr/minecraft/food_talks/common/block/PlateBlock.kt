@@ -12,9 +12,12 @@ import net.minecraft.core.Registry
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceKey
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.ItemInteractionResult
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
@@ -130,7 +133,14 @@ class PlateBlock private constructor(): Block(Properties.of().apply {
         return if (!entity.putItem(stack))
             ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
         else {
-            // level.playSound() TODO
+            level.playSound(
+                player,
+                pos,
+                SoundEvents.ITEM_FRAME_ADD_ITEM,
+                SoundSource.BLOCKS,
+                1F, 1F
+            )
+
 
             if (!player.hasInfiniteMaterials())
                 player.setItemInHand(

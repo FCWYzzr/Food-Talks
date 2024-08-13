@@ -63,7 +63,6 @@ object Sandwich: CompoundFood(
             )
 
             // apply effects
-            // todo fixit
             Cocktail.mergePotionContent(effect, entity)
         }
 
