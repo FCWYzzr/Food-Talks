@@ -13,13 +13,11 @@ import indi.fcwyzzr.minecraft.food_talks.toMobEffectInstanceSequence
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.tags.TagKey
 import net.minecraft.util.Mth
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.food.FoodProperties
 import net.minecraft.world.food.FoodProperties.PossibleEffect
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack

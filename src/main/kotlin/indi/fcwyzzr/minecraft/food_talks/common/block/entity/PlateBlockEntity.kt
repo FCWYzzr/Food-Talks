@@ -15,7 +15,6 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.NbtOps
-import net.minecraft.network.Connection
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
@@ -23,12 +22,11 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
-import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.RegisterEvent
 import org.slf4j.Logger
-import java.util.Optional
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 class PlateBlockEntity(
@@ -74,7 +72,7 @@ class PlateBlockEntity(
         if (itemStack.components[DataComponents.FOOD] == null)
             return false
 
-        // todo add seasonings
+        // todo add seasonings(next version)
         if (itemStack.components[DataComponents.FOOD]!!.usingConvertsTo.isPresent)
             return false
 

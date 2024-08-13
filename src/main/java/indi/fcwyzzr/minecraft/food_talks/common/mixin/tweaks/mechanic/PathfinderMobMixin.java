@@ -21,7 +21,7 @@ public class PathfinderMobMixin extends Mob {
     
     @SuppressWarnings("UnreachableCode")
     @Inject(method = "<init>", at=@At("RETURN"))
-    void init_mixin(EntityType<? extends Mob> entityType, Level level, CallbackInfo ci){
+    void constructor_mixin(EntityType<? extends Mob> entityType, Level level, CallbackInfo ci){
         final var self = (PathfinderMob) (Object) this;
         
         if (level != null && !level.isClientSide) {

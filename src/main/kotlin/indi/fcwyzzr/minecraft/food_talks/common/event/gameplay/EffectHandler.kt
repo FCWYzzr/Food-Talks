@@ -27,7 +27,6 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Start
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Tick
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent.Applicable
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent.Remove
-import net.neoforged.neoforge.event.level.BlockDropsEvent
 import net.neoforged.neoforge.event.level.BlockEvent.BreakEvent
 import kotlin.math.max
 
