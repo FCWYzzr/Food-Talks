@@ -168,8 +168,6 @@ object EffectHandler {
 
     @SubscribeEvent
     fun miningDuringGrace(event: BreakEvent){
-        // todo mine with improper tool still drop
-        // todo mine in creative still drop
         if (event.player.level().isClientSide)
             return
 
