@@ -62,19 +62,7 @@ abstract class CompoundFood(
     }
 
     open fun buildItemStack(action: DataComponentPatch.Builder.() -> Unit): ItemStack{
-        val itemProperty: FoodItemProperties = this.components()[FoodItemProperties.type]!!
-        val stackProperty: FoodStackProperties? = this.components()[FoodStackProperties.type]
-
         val itemStack = ItemStack(Holder.direct(this), 1, buildDataComponentPatch {
-            set(DataComponents.FOOD, FoodProperties(
-                stackProperty ?.nutrition ?: 0,
-                stackProperty ?.saturation ?: 0F,
-                itemProperty.canAlwaysEat,
-                itemProperty.chewSeconds,
-                itemProperty.convertsTo,
-                listOf()
-            ))
-
             this.action()
         })
 
