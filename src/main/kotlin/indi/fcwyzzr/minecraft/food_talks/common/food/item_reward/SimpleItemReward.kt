@@ -184,15 +184,6 @@ val carrotMakesYouSeeBetter = FoodItemReward.countBased(
     MobEffects.NIGHT_VISION, 1 * FoodTalks.TPS
 )
 
-//val potatoMakesYouDirty = FoodItemReward.countBased(
-//    Items.POTATO.toResourceKey(),
-//    todo("dirty"), 1 * FoodTalks.TPS),
-//)
-//
-//val beetrootMakesYouRed = FoodItemReward.countBased(
-//    Items.BEETROOT.toResourceKey(),
-//    todo("red"), 1 * FoodTalks.TPS),
-//)
 
 val driedKelpMakesYouStarving = FoodItemReward.countBased(
     Items.DRIED_KELP.toResourceKey(),
