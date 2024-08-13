@@ -74,7 +74,7 @@ class PlateBlockEntity(
         if (itemStack.components[DataComponents.FOOD] == null)
             return false
 
-        // todo
+        // todo add seasonings
         if (itemStack.components[DataComponents.FOOD]!!.usingConvertsTo.isPresent)
             return false
 
