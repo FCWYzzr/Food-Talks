@@ -31,6 +31,9 @@ abstract class FoodItemReward(
     abstract fun extendTime(ingredientCount: Int): Int
     abstract fun amplifier(ingredientCount: Int): Int
 
+    operator fun invoke(ingredientCount: Int) =
+        MobEffectInstance(effect, extendTime(ingredientCount), amplifier(ingredientCount))
+
     companion object {
         fun countBased(
             key: ResourceKey<Item>,
