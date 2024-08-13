@@ -219,7 +219,7 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
 
                     entity.addPotion((stack
                         .components[DataComponents.POTION_CONTENTS]
-                        ?: PotionContents.EMPTY).toMobEffectInstanceList()
+                        ?: PotionContents.EMPTY).toMobEffectInstanceList{it}
                     )
 
                     if (!player.hasInfiniteMaterials())
