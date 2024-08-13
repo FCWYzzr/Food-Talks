@@ -9,4 +9,7 @@ public interface MobEffectInstanceAccessor extends Comparable<MobEffectInstance>
     
     @Accessor(value = "hiddenEffect")
     MobEffectInstance getHiddenEffect();
+    
+    @Accessor(value = "duration")
+    void setDuration(int value);
 }
