@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {"item": "food_talks:plate"}
+  ],
+  "result": {
+    "id": "minecraft:bowl",
+    "count": 1
+  }
+}
