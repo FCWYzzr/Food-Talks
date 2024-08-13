@@ -16,7 +16,8 @@ import indi.fcwyzzr.minecraft.food_talks.common.food.tag_punishment.*
 import indi.fcwyzzr.minecraft.food_talks.common.item.Cocktail
 import indi.fcwyzzr.minecraft.food_talks.common.item.Plate
 import indi.fcwyzzr.minecraft.food_talks.common.item.Sandwich
-import indi.fcwyzzr.minecraft.food_talks.common.registries.*
+import indi.fcwyzzr.minecraft.food_talks.common.registries.foodItemRewardRegistry
+import indi.fcwyzzr.minecraft.food_talks.common.registries.foodTagPunishmentRegistry
 import indi.fcwyzzr.minecraft.food_talks.toRegistryName
 import indi.fcwyzzr.minecraft.food_talks.toResourceLocation
 import net.minecraft.core.registries.BuiltInRegistries
@@ -152,6 +153,12 @@ object FTLifecycle {
                 "SandwichLayer".toRegistryName().toResourceLocation(),
                 SimpleDataComponents.SandwichLayer
             )
+
+            it.register(
+                "PossibleEffectList".toRegistryName().toResourceLocation(),
+                SimpleDataComponents.PossibleEffectList
+            )
         }
     }
+
 }
