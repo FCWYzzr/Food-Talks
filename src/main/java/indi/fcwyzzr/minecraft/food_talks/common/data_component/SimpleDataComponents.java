@@ -10,6 +10,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -19,6 +20,8 @@ public interface SimpleDataComponents {
     interface SimpleCodecs {
         Codec<List<Holder<Item>>> itemList = ItemStack.ITEM_NON_AIR_CODEC.listOf();
         Codec<List<ItemStack>> itemStackList = ItemStack.SINGLE_ITEM_CODEC.listOf();
+        Codec<List<FoodProperties.PossibleEffect>> possibleEffectList =
+            FoodProperties.PossibleEffect.CODEC.listOf();
     }
     interface SimpleStreamCodecs{
         StreamCodec<RegistryFriendlyByteBuf, List<Holder<Item>>> itemList = ByteBufCodecs
@@ -26,6 +29,11 @@ public interface SimpleDataComponents {
                 ByteBufCodecs.collection(NonNullList::createWithCapacity)
             );
         StreamCodec<RegistryFriendlyByteBuf, List<ItemStack>> itemStackList = ItemStack.LIST_STREAM_CODEC;
+        StreamCodec<RegistryFriendlyByteBuf, List<FoodProperties.PossibleEffect>> possibleEffectList =
+            FoodProperties.PossibleEffect.STREAM_CODEC.apply(
+                ByteBufCodecs.collection(NonNullList::createWithCapacity)
+            );
+        
     }
     
     DataComponentType<List<Holder<Item>>> SandwichLayer = DataComponentType
@@ -34,4 +42,10 @@ public interface SimpleDataComponents {
         .networkSynchronized(SimpleStreamCodecs.itemList)
         .build();
     
+    DataComponentType<List<FoodProperties.PossibleEffect>> PossibleEffectList =
+        DataComponentType
+            .<List<FoodProperties.PossibleEffect>>builder()
+            .persistent(SimpleCodecs.possibleEffectList)
+            .networkSynchronized(SimpleStreamCodecs.possibleEffectList)
+            .build();
 }
