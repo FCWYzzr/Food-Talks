@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "neoforge:conditions": [{
+    "type": "neoforge:true"
+  }],
+  "ingredients": [
+    {"item": "minecraft:bowl"}
+  ],
+  "result": {
+    "id": "food_talks:plate",
+    "count": 1
+  }
+}
