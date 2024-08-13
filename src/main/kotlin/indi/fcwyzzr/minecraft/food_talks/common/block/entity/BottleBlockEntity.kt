@@ -40,11 +40,10 @@ class BottleBlockEntity(
 
     private val contents = mutableMapOf<Holder<MobEffect>, MobEffectInstance>()
 
-    fun addPotion(effects: Collection<MobEffectInstance>){
+    fun addPotion(effects: Iterable<MobEffectInstance>){
         setChanged()
         waterLevel ++
         effects
-            .asSequence()
             .map { it.effect to it }
             .map { (effect, instance) ->
                 effect to mergeMobEffectInstance(
@@ -92,7 +91,6 @@ class BottleBlockEntity(
         extend = tag.getInt("extend")
 
         tag.getList("contents", 10)
-            .asSequence()
             .map {
                 MobEffectInstance.CODEC.parse(
                     registries.createSerializationContext(NbtOps.INSTANCE),
@@ -109,7 +107,7 @@ class BottleBlockEntity(
     override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
         super.saveAdditional(tag, registries)
         val contentTag = ListTag().apply {
-            contents.asSequence()
+            contents.asIterable()
                 .map {
                     MobEffectInstance.CODEC.encodeStart(
                         registries.createSerializationContext(NbtOps.INSTANCE),

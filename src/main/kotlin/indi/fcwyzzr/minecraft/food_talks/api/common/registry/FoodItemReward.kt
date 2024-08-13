@@ -36,7 +36,7 @@ abstract class FoodItemReward(
             key: ResourceKey<Item>,
             effect: Holder<MobEffect>,
             duration: Int,
-            amplifier: Int = 1,
+            amplifier: Int = 0,
             multiplyTime: Boolean = true,
             multiplyAmplifier: Boolean = true
             ) = object: FoodItemReward(
@@ -44,10 +44,10 @@ abstract class FoodItemReward(
             effect
         ){
             override fun extendTime(ingredientCount: Int) = duration *
-                    if (multiplyTime) ingredientCount else 1
+                    if (multiplyTime) ingredientCount - 1 else 0
 
             override fun amplifier(ingredientCount: Int) = amplifier *
-                    if (multiplyAmplifier) ingredientCount else 1
+                    if (multiplyAmplifier) ingredientCount - 1 else 0
         }
     }
 }

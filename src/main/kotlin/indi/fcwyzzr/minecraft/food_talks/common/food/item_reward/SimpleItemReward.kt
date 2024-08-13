@@ -18,7 +18,7 @@ private fun Item.toResourceKey() = BuiltInRegistries
 // <drinks>
 val honeyResistToPoison = FoodItemReward.countBased(
     Items.HONEY_BOTTLE.toResourceKey(),
-    PoisonResistance.holder, 10 * FoodTalks.TPS, 1,
+    PoisonResistance.holder, 10 * FoodTalks.TPS, 0,
     multiplyTime = true, multiplyAmplifier = true
 )
 // </drinks>
@@ -57,7 +57,7 @@ val beefMakesYouStrong = FoodItemReward.countBased(
 
 val cookedBeefMakesYouStronger = FoodItemReward.countBased(
     Items.COOKED_BEEF.toResourceKey(),
-    MobEffects.DAMAGE_BOOST, 10 * FoodTalks.TPS, 2
+    MobEffects.DAMAGE_BOOST, 10 * FoodTalks.TPS, 1
 )
 
 val salmonMakesYouSwimFast = FoodItemReward.countBased(
@@ -87,7 +87,7 @@ val porkchopMakesYouBearing = FoodItemReward.countBased(
 
 val cookedPorkchopMakesYouEvenMoreBearing = FoodItemReward.countBased(
     Items.COOKED_PORKCHOP.toResourceKey(),
-    MobEffects.ABSORPTION, 10 * FoodTalks.TPS, 2
+    MobEffects.ABSORPTION, 10 * FoodTalks.TPS, 1
 )
 
 val chickenMakesYouLightweight = FoodItemReward.countBased(
@@ -107,7 +107,7 @@ val muttonMakesYouSmelly = FoodItemReward.countBased(
 
 val cookedMuttonMakesYouMoreSmelly = FoodItemReward.countBased(
     Items.COOKED_MUTTON.toResourceKey(),
-    Smelly.holder, 10 * FoodTalks.TPS, 2
+    Smelly.holder, 10 * FoodTalks.TPS, 1
 )
 
 val rabbitMakesYouJumpHigh = FoodItemReward.countBased(
@@ -117,7 +117,7 @@ val rabbitMakesYouJumpHigh = FoodItemReward.countBased(
 
 val cookedRabbitMakesYouJumpHigher = FoodItemReward.countBased(
     Items.COOKED_RABBIT.toResourceKey(),
-    MobEffects.JUMP, 10 * FoodTalks.TPS, 2
+    MobEffects.JUMP, 10 * FoodTalks.TPS, 1
 )
 
 // gives you nothing: pufferfish; tropical_fish

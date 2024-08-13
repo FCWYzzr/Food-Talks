@@ -1,10 +1,14 @@
 package indi.fcwyzzr.minecraft.food_talks.common.effects.harmful
 
 import indi.fcwyzzr.minecraft.f_lib.registry.FMobEffect
+import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
+import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodItemProperties
+import net.minecraft.core.component.DataComponents
 import net.minecraft.world.Difficulty
 import net.minecraft.world.effect.MobEffectCategory
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
 
 
 /**
@@ -36,5 +40,21 @@ object Anorexia: FMobEffect(
     override fun onEffectAdded(entity: LivingEntity, amplifier: Int){
         if (entity is Player)
             entity.foodData.setExhaustion(0F)
+    }
+
+    fun canEat(itemStack: ItemStack, entity: LivingEntity): Boolean {
+        if (!CompoundFood.isFood(itemStack))
+            return false
+
+        if (entity.hasEffect(Anorexia.holder))
+            return false
+
+        return (entity !is Player) || entity.canEat(
+            itemStack.components[DataComponents.FOOD]
+                ?.canAlwaysEat
+                ?: itemStack.components[FoodItemProperties.type]
+                    ?.canAlwaysEat
+                    ?: false
+        )
     }
 }

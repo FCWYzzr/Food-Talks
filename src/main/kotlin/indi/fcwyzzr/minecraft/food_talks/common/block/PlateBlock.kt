@@ -99,7 +99,7 @@ class PlateBlock private constructor(): Block(Properties.of().apply {
             return InteractionResult.SUCCESS
         }
 
-        if (entity.lastCover == null)
+        if (!entity.canAssembly)
             return InteractionResult.PASS
 
         val stack = Sandwich.assemblyFromPlate(entity)
@@ -211,7 +211,6 @@ class PlateBlock private constructor(): Block(Properties.of().apply {
                         map
                     }
                     .flatMap { it.value.values }
-                    .asSequence()
                     .forEach{
                         popResource(level, pos, it)
                     }

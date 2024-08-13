@@ -3,7 +3,6 @@ package indi.fcwyzzr.minecraft.food_talks.common.block
 import indi.fcwyzzr.minecraft.f_lib.registry.FRegistry
 import indi.fcwyzzr.minecraft.food_talks.common.block.entity.BottleBlockEntity
 import indi.fcwyzzr.minecraft.food_talks.common.item.Cocktail
-import indi.fcwyzzr.minecraft.food_talks.toMobEffectInstanceList
 import indi.fcwyzzr.minecraft.food_talks.toRegistryName
 import indi.fcwyzzr.minecraft.food_talks.toResourceLocation
 import net.minecraft.core.BlockPos
@@ -31,6 +30,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.neoforged.neoforge.registries.DeferredHolder
@@ -219,7 +219,8 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
 
                     entity.addPotion((stack
                         .components[DataComponents.POTION_CONTENTS]
-                        ?: PotionContents.EMPTY).toMobEffectInstanceList{it}
+                        ?: PotionContents.EMPTY)
+                        .allEffects
                     )
 
                     if (!player.hasInfiniteMaterials())
@@ -235,7 +236,15 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
         return result
     }
 
-
+    override fun getCloneItemStack(
+        state: BlockState,
+        target: HitResult,
+        level: LevelReader,
+        pos: BlockPos,
+        player: Player
+    ): ItemStack {
+        return Items.GLASS_BOTTLE.defaultInstance
+    }
 
 
     companion object: FRegistry<Block>{

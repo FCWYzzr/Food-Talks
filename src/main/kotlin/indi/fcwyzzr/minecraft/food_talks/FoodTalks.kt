@@ -5,8 +5,6 @@ import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.RandomSource
-import net.minecraft.world.effect.MobEffectInstance
-import net.minecraft.world.item.alchemy.PotionContents
 import net.neoforged.fml.common.Mod
 import org.slf4j.Logger
 
@@ -38,10 +36,6 @@ fun String.toRegistryName() = buildString{
         }
 }
 
-fun String.toMinecraftResourceLocation(): ResourceLocation =
-    ResourceLocation
-        .fromNamespaceAndPath("minecraft", this)
-
 fun String.toResourceLocation(): ResourceLocation =
     ResourceLocation
         .fromNamespaceAndPath(FoodTalks.MOD_ID, this)
@@ -52,14 +46,3 @@ fun <T> ResourceLocation.toRegistryKey(): ResourceKey<Registry<T>> =
 
 fun <T> ResourceLocation.toResourceKeyOf(registry: ResourceKey<Registry<T>>): ResourceKey<T> =
     ResourceKey.create(registry, this)
-
-fun PotionContents.toMobEffectInstanceSequence() = sequence{
-    yieldAll(customEffects)
-    yieldAll(potion.get().value().effects)
-}
-
-fun <T> PotionContents.toMobEffectInstanceList(
-    mapper: (MobEffectInstance) -> T
-): List<T> = toMobEffectInstanceSequence()
-    .map(mapper)
-    .toList()

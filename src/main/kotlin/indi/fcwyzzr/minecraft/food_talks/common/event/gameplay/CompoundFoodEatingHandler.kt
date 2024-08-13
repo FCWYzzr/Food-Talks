@@ -26,14 +26,13 @@ object CompoundFoodEatingHandler {
             return
 
 
-        itemStack.damageValue += 1
-        if (itemStack.maxDamage == itemStack.damageValue)
-            return
-
-        tick.duration += chewTick
-
-
         val entity = tick.entity
-        item.uponBite(itemStack, itemStack.damageValue, entity)
+        if (item.uponBite(itemStack, entity) && itemStack.damageValue < itemStack.maxDamage)
+            tick.duration += chewTick
+        else
+            tick.isCanceled = true
+
+
+        itemStack.damageValue += 1
     }
 }

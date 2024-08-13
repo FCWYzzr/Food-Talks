@@ -18,11 +18,13 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.GameRules
 import net.minecraft.world.level.block.Block
 import net.neoforged.api.distmarker.Dist
+import net.neoforged.bus.api.ICancellableEvent
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Start
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Tick
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent.Applicable
@@ -50,9 +52,10 @@ object EffectHandler {
     }
 
     @SubscribeEvent
-    fun entityTryToEatWhenAnorexiaOrVomit(event: Start){
+    fun entityTryToEatWhenAnorexiaOrVomit(event: LivingEntityUseItemEvent){
         if (!event.entity.hasEffect(Anorexia.holder)
-            && !event.entity.hasEffect(Vomit.holder))
+            && !event.entity.hasEffect(Vomit.holder)
+        )
             return
 
         val holdItem = event.entity.mainHandItem
@@ -63,7 +66,7 @@ object EffectHandler {
         if (holdItem.`is` { !it.isBound })
             return
 
-        if (holdItem.`is` { it.value().components().has(DataComponents.FOOD) })
+        if (CompoundFood.isFood(event.item) && event is ICancellableEvent)
             event.isCanceled = true
     }
 
@@ -75,7 +78,7 @@ object EffectHandler {
             return
         if (!event.entity.hasEffect(Toothache.holder))
             return
-        if (!event.item.item.components().has(DataComponents.FOOD))
+        if (!CompoundFood.isFood(event.item))
             return
 
         event.entity.hurt(ToothacheDamage from event.entity.level(), 1F)
@@ -88,12 +91,12 @@ object EffectHandler {
         if (event.duration % 10 != 0)
             return
 
-        if (!event.item.item.components().has(DataComponents.FOOD)
-            && event.item.item !is CompoundFood)
+        if (!CompoundFood.isFood(event.item))
             return
 
         val starvingLevel = event.entity.getEffect(Starving.holder)
             ?.amplifier
+            ?.plus(1)
             ?: return
 
         event.duration = max(1, event.duration - pow(starvingLevel + 1, 2))
@@ -109,7 +112,7 @@ object EffectHandler {
         val resistant = event.entity.getEffect(PoisonResistance.holder)!!
         val poison = event.effectInstance!!
 
-        event.result = if (resistant.amplifier >= poison.amplifier)
+        event.result = if (resistant.amplifier + 1 >= poison.amplifier)
             Applicable.Result.DO_NOT_APPLY
         else
             Applicable.Result.DEFAULT
@@ -138,6 +141,7 @@ object EffectHandler {
 
         attacker.getEffect(GoddessGrace.holder)
             ?.amplifier
+            ?.plus(1)
             ?.let { graceLevel ->
                 val multiply = Mth.randomBetween(
                     FoodTalks.random,
@@ -152,6 +156,7 @@ object EffectHandler {
 
         attacker.getEffect(MojangGrace.holder)
             ?.amplifier
+            ?.plus(1)
             ?.let { graceLevel ->
                 val multiply = Mth.randomBetween(
                     FoodTalks.random,
@@ -186,6 +191,7 @@ object EffectHandler {
 
         val drops = miner.getEffect(GoddessGrace.holder)
             ?.amplifier
+            ?.plus(1)
             .let { graceLevel ->
                 val multiply =
                     if (graceLevel != null)
@@ -215,6 +221,7 @@ object EffectHandler {
 
         val chance = miner.getEffect(MojangGrace.holder)
             ?.amplifier
+            ?.plus(1)
             ?.apply {
                 val multiply = Mth.randomBetween(
                     FoodTalks.random,
@@ -240,9 +247,8 @@ object EffectHandler {
 
     @SubscribeEvent
     fun tryToAttackSmelly(event: LivingChangeTargetEvent){
-        if (event.newAboutToBeSetTarget == null)
-            return
-        event.isCanceled = event.newAboutToBeSetTarget!!.hasEffect(Smelly.holder)
+        val newTarget = event.newAboutToBeSetTarget ?: return
+        event.isCanceled = newTarget.hasEffect(Smelly.holder)
     }
 
     @SubscribeEvent

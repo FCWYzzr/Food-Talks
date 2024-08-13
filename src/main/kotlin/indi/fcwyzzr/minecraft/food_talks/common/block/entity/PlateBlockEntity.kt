@@ -41,13 +41,7 @@ class PlateBlockEntity(
 
     val size get() = ingredient.size
 
-    val frontCover: ItemStack? get() = ingredient.getOrNull(0)
-    val lastCover: ItemStack? get(){
-        return if (ingredient.size < 2 || !ingredient.last().`is`(sandwichCover))
-            null
-        else
-            ingredient.last()
-    }
+    val canAssembly get() = ingredient.size > 1 && ingredient.last().`is`(sandwichCover)
 
     fun clear(){
         display = null
@@ -118,7 +112,7 @@ class PlateBlockEntity(
                 display = displayItem.getOrNull()
             }
             ?: tag.getList("ingredients", 10)
-                .asSequence()
+                .asIterable()
                 .map {
                     ItemStack.CODEC.parse(
                         registries.createSerializationContext(NbtOps.INSTANCE),
@@ -147,7 +141,7 @@ class PlateBlockEntity(
 
         val contentTag = ListTag().apply {
             ingredient
-                .asSequence()
+                .asIterable()
                 .map {
                     ItemStack.CODEC.encodeStart(
                         registries.createSerializationContext(NbtOps.INSTANCE),
@@ -175,7 +169,6 @@ class PlateBlockEntity(
         private val LOGGER: Logger = LogUtils.getLogger()
 
         private const val MAX_LAYER = 15
-        private const val MAX_INGREDIENT = MAX_LAYER - 2
 
         @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
         val type: BlockEntityType<PlateBlockEntity> = BlockEntityType.Builder.of(

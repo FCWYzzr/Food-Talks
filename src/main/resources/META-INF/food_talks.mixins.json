@@ -8,6 +8,7 @@
     "accessors.mechanic.MobEffectInstanceAccessor",
     "tweaks.item.BottleBlockItem",
     "tweaks.mechanic.FoodDataMixin",
+    "tweaks.mechanic.ItemMixin",
     "tweaks.mechanic.LivingEntityMixin",
     "tweaks.mechanic.PathfinderMobMixin"
   ],

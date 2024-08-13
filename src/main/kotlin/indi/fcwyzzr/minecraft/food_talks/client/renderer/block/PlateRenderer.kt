@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import indi.fcwyzzr.minecraft.food_talks.client.renderer.item.SandwichRenderer
 import indi.fcwyzzr.minecraft.food_talks.common.block.entity.PlateBlockEntity
-import indi.fcwyzzr.minecraft.food_talks.common.data_component.SimpleDataComponents
 import indi.fcwyzzr.minecraft.food_talks.common.item.Sandwich
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
@@ -37,7 +36,7 @@ object PlateRenderer: BlockEntityRenderer<PlateBlockEntity> {
             if (item.`is`(Sandwich))
                 SandwichRenderer.renderLayersWithLayerOffset(
                     1,
-                    item.components[SimpleDataComponents.SandwichLayer]!!,
+                    Sandwich.layers(item),
                     poseStack,
                     buffer,
                     combinedLight,

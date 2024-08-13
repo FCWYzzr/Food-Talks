@@ -37,7 +37,7 @@ public class BottleBlockItem extends Item {
     @Override
     @Nonnull
     public InteractionResult useOn(@Nonnull UseOnContext pContext) {
-        InteractionResult interactionresult = this.place_mixin(new BlockPlaceContext(pContext));
+        InteractionResult interactionresult = place_mixin(new BlockPlaceContext(pContext));
         if (!interactionresult.consumesAction() && pContext.getItemInHand().has(DataComponents.FOOD)) {
             InteractionResult interactionResult1 = super.use(pContext.getLevel(), Objects.requireNonNull(pContext.getPlayer()), pContext.getHand()).getResult();
             return interactionResult1 == InteractionResult.CONSUME ? InteractionResult.CONSUME_PARTIAL : interactionResult1;
@@ -73,7 +73,7 @@ public class BottleBlockItem extends Item {
         level.playSound(
             player,
             blockpos,
-            this.getPlaceSound_mixin(level, blockpos, context.getPlayer()),
+            getPlaceSound_mixin(level, blockpos, context.getPlayer()),
             SoundSource.BLOCKS,
             (soundtype.getVolume() + 1.0F) / 2.0F,
             soundtype.getPitch() * 0.8F

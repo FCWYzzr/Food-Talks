@@ -36,7 +36,7 @@ object Bewlr: BlockEntityWithoutLevelRenderer(
         packedLight: Int,
         packedOverlay: Int
     ){
-        val layers = stack.components[SimpleDataComponents.SandwichLayer]!!
+        val layers = Sandwich.layers(stack)
 
         SandwichRenderer.renderLayersWithCenter(
             layers,

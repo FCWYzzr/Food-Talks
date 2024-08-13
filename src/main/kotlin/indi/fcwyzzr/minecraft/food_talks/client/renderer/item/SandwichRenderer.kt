@@ -22,10 +22,15 @@ object SandwichRenderer {
         val size = layer.size
         val startOffsetLayer = size / 2
         if (size % 2 == 0)
-            renderLayersWithLayerOffset(16 - startOffsetLayer, layer, poseStack, buffer, light, overlay)
+            renderLayersWithLayerOffset(
+                8 - startOffsetLayer,
+                layer,
+                poseStack,
+                buffer,
+                light,
+                overlay)
         else
-            renderLayers((16.0 - startOffsetLayer) * LAYER_HEIGHT, layer, poseStack, buffer, light, overlay)
-
+            renderLayers((8.0 - startOffsetLayer) * LAYER_HEIGHT, layer, poseStack, buffer, light, overlay)
     }
 
     fun renderLayersWithLayerOffset(
@@ -59,9 +64,10 @@ object SandwichRenderer {
             .map(Item::getDefaultInstance)
             .forEachIndexed { offset, item ->
                 poseStack.pushPose()
-                poseStack.translate(0.0, offset * LAYER_HEIGHT, 0.0)
 
+                poseStack.translate(0.0, offset * LAYER_HEIGHT, 0.0)
                 poseStack.mulPose(Axis.XP.rotationDegrees(90F))
+
                 if (item.`is`(sandwichCover))
                     poseStack.scale(1F, 1F, 1F)
                 else
@@ -79,6 +85,6 @@ object SandwichRenderer {
                 )
                 poseStack.popPose()
             }
-            poseStack.popPose()
+        poseStack.popPose()
     }
 }
