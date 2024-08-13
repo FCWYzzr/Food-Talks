@@ -27,14 +27,17 @@ abstract class FoodTagPunishment(
     abstract fun extendTime(punishLevel: Int): Int
     abstract fun amplifier(punishLevel: Int): Int
 
+    operator fun invoke(punishLevel: Int) =
+        MobEffectInstance(effect, extendTime(punishLevel), amplifier(punishLevel))
+
     companion object {
         fun levelBased(
-            name: String,
+            location: ResourceLocation,
             effect: Holder<MobEffect>, duration: Int, amplifier: Int = 1,
             multiplyTime: Boolean = true,
             multiplyAmplifier: Boolean = true
         ) = object: FoodTagPunishment(
-            name.toRegistryName().toResourceLocation(),
+            location,
             effect
         ){
             override fun extendTime(punishLevel: Int) = duration *
