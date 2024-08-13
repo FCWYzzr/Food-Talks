@@ -111,16 +111,17 @@ object Cocktail: CompoundFood(
         return when {
             base === null -> addon
             addon.amplifier > base.amplifier -> mergeMobEffectInstance(base, addon)
-            addon.amplifier == base.amplifier -> MobEffectInstance(
-                base.effect,
-                base.duration + addon.duration,
-                base.amplifier
-            )
-            addon.amplifier < base.amplifier -> MobEffectInstance(
-                base.effect,
-                base.duration + addon.duration * base.amplifier / addon.amplifier,
-                base.amplifier
-            )
+            addon.amplifier == base.amplifier -> {
+                (base as MobEffectInstanceAccessor)
+                    .setDuration(base.duration + addon.duration)
+
+                base
+            }
+            addon.amplifier < base.amplifier -> {
+                (base as MobEffectInstanceAccessor)
+                    .setDuration(base.duration + addon.duration * base.amplifier / addon.amplifier)
+                base
+            }
 
             else -> throw Error("???")
         }
