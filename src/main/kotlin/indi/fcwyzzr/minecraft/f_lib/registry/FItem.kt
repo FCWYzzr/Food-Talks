@@ -13,7 +13,7 @@ abstract class FItem(property: Properties): Item(property), FRegistry<Item> {
     val name = javaClass.simpleName.toRegistryName()
 
     final override val location = name.toResourceLocation()
-    final override val registryKey: ResourceKey<Registry<Item>> = BuiltInRegistries.ITEM.key()
+    final override val registryKey: ResourceKey<out Registry<Item>> = BuiltInRegistries.ITEM.key()
     final override val holder: Holder<Item> = DeferredHolder.create(registryKey, location)
 
 }
