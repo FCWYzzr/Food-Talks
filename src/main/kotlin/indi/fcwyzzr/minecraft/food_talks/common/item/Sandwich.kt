@@ -6,12 +6,15 @@ import indi.fcwyzzr.minecraft.food_talks.client.renderer.Bewlr
 import indi.fcwyzzr.minecraft.food_talks.common.block.entity.PlateBlockEntity
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.SimpleDataComponents
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodStackProperties
+import indi.fcwyzzr.minecraft.food_talks.common.effects.harmful.Anorexia
 import indi.fcwyzzr.minecraft.food_talks.common.mixin.accessors.mechanic.MobEffectInstanceAccessor
 import indi.fcwyzzr.minecraft.food_talks.common.registries.foodItemRewardRegistry
 import indi.fcwyzzr.minecraft.food_talks.common.registries.foodTagPunishmentRegistry
+import indi.fcwyzzr.minecraft.food_talks.toResourceLocation
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.tags.TagKey
 import net.minecraft.util.Mth
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
@@ -20,6 +23,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.food.FoodProperties.PossibleEffect
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import net.minecraft.world.item.alchemy.PotionContents
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions
 import org.spongepowered.include.com.google.common.collect.Iterables
@@ -30,7 +34,9 @@ import kotlin.math.min
 
 object Sandwich: CompoundFood(
     0.5F,
-    256
+    1,
+    null,
+    true
 ) {
 
     fun layers(itemStack: ItemStack): List<Holder<Item>>{
@@ -71,7 +77,7 @@ object Sandwich: CompoundFood(
         if (food != null)
             entity.foodData.eat(food.nutritionPerBite, food.saturationPerBite)
 
-        return entity.canEat(false)
+        return true
     }
 
     /**
@@ -92,46 +98,63 @@ object Sandwich: CompoundFood(
             .unpack()
 
         // food reward
-        entity
+        val foodCounter = entity
             .readOnlyIngredient
-            .parallelStream()
-            .map { BuiltInRegistries.ITEM.getResourceKey(it.item) }
-            .map { it.getOrNull() }
-            .filter { it != null }
-            .map { mapOf(it!!.location() to 1)  }
-            .reduce {m1, m2 -> buildMap{
+            .asSequence()
+            .map { mutableMapOf(it.item to 1)  }
+            .reduce {m1, m2 ->
                 val intersect = m1.keys intersect m2.keys
-                intersect.forEach{k ->
-                        put(k, m1[k]!! + m2[k]!!)
-                    }
 
-                m1.filterNot {(k, _) ->
-                    k in intersect
-                }.forEach(::put)
+                intersect.forEach{k ->
+                    m1[k] = m1[k]!! + m2[k]!!
+                }
 
                 m2.filterNot {(k, _) ->
                     k in intersect
-                }.forEach(::put)
-            }}
-            .getOrNull()!!
-            .mapNotNull { value ->
-                val location = value.key
-                val count = value.value
-                
+                }.forEach(m1::put)
+
+                m1
+            }
+
+
+        foodCounter[Items.BREAD] = foodCounter[Items.BREAD]!! - 1
+
+        foodCounter
+            .map { (item, count) ->
+                BuiltInRegistries.ITEM.getResourceKey(item) to count
+            }
+            .mapNotNull { (key, count) ->
+                key.getOrNull() ?.location() ?.to(count)
+            }
+            .mapNotNull { (location, count) ->
+
                 val reward = foodItemRewardRegistry[location]
                     ?: return@mapNotNull null
 
                 reward.effect.value() to (reward(count)to 1F)
-            }.fold(effectFolder, EffectFolder::fold)
-            
+            }
+            .fold(effectFolder, EffectFolder::fold)
+
+
+
+
 
         val tagCounter = entity
             .readOnlyIngredient
+            .asSequence()
             .flatMap { it.tags.toList() }
             .filter { it.location.namespace == FoodTalks.MOD_ID }
             .filter { it.location.path.startsWith("food_category") }
             .groupingBy { it }
             .fold(0){i, _ -> i + 1}
+            .toMutableMap()
+
+        val key = TagKey.create(
+            BuiltInRegistries.ITEM.key(),
+            "food_category/staples".toResourceLocation()
+        )
+
+        tagCounter[key] = tagCounter[key]!! - 1
 
         val tagPunishmentThreshold = tagCounter.values
             .sorted().let {

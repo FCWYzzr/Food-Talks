@@ -82,12 +82,12 @@ val cookedCodMakesYouBreathEasier = FoodItemReward.countBased(
 
 val porkchopMakesYouBearing = FoodItemReward.countBased(
     Items.PORKCHOP.toResourceKey(),
-    MobEffects.ABSORPTION, 5 * FoodTalks.TPS
+    MobEffects.ABSORPTION, 15 * FoodTalks.TPS
 )
 
 val cookedPorkchopMakesYouEvenMoreBearing = FoodItemReward.countBased(
     Items.COOKED_PORKCHOP.toResourceKey(),
-    MobEffects.ABSORPTION, 10 * FoodTalks.TPS, 1
+    MobEffects.ABSORPTION, 30 * FoodTalks.TPS, 2
 )
 
 val chickenMakesYouLightweight = FoodItemReward.countBased(
@@ -129,9 +129,9 @@ val appleMakesYouHappy = FoodItemReward.countBased(
     Happy.holder, 5 * FoodTalks.TPS
 )
 
-val chorusFruitGivesYouUnstable = FoodItemReward.countBased(
+val chorusFruitProtectYouFromProjectile = FoodItemReward.countBased(
     Items.CHORUS_FRUIT.toResourceKey(),
-    ProjectileImmune.holder, 1
+    ProjectileImmune.holder, 10 * FoodTalks.TPS
 )
 
 val sweetBerryMakesYouFast = FoodItemReward.countBased(
@@ -162,7 +162,7 @@ val cookieMakesYouHappy = FoodItemReward.countBased(
 
 val breadMakesYouFull = FoodItemReward.countBased(
     Items.BREAD.toResourceKey(),
-    MobEffects.SATURATION, 10 * FoodTalks.TPS
+    MobEffects.SATURATION, FoodTalks.TPS / 2
 )
 
 val bakedPotatoMakesYouHot = FoodItemReward.countBased(

@@ -69,7 +69,7 @@ object FTLifecycle {
 
         // fruits
         event doRegister appleMakesYouHappy
-        event doRegister chorusFruitGivesYouUnstable
+        event doRegister chorusFruitProtectYouFromProjectile
         event doRegister sweetBerryMakesYouFast
         event doRegister melonMakesYouHeal
 

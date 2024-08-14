@@ -7,7 +7,6 @@ import indi.fcwyzzr.minecraft.food_talks.common.effects.beneficial.*
 import indi.fcwyzzr.minecraft.food_talks.common.effects.harmful.*
 import indi.fcwyzzr.minecraft.food_talks.common.registries.ToothacheDamage
 import indi.fcwyzzr.minecraft.food_talks.common.registries.from
-import net.minecraft.core.component.DataComponents
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
@@ -25,7 +24,6 @@ import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Start
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Tick
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent.Applicable
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent.Remove
@@ -85,7 +83,7 @@ object EffectHandler {
     }
 
     @SubscribeEvent
-    fun entityEatingWhenStaring(event: Tick){
+    fun entityEatingWhenStarving(event: Tick){
         if (event.duration < 20)
             return
         if (event.duration % 10 != 0)

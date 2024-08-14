@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.UseAnim
 import net.minecraft.world.level.Level
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 abstract class CompoundFood(
     chewSeconds: Float,
@@ -66,6 +67,23 @@ abstract class CompoundFood(
     companion object{
         fun isFood(itemStack: ItemStack): Boolean{
             return itemStack.components.has(DataComponents.FOOD) || itemStack.item is CompoundFood
+        }
+
+        fun containerOrNull(itemStack: ItemStack): ItemStack? {
+            if (!isFood(itemStack))
+                return null
+            return itemStack.components
+                .let {
+                    it[DataComponents.FOOD]
+                        ?.usingConvertsTo
+                        ?: it[FoodItemProperties.type]
+                            ?.convertsTo
+
+                }?.getOrNull()
+        }
+
+        fun isHandHoldFood(itemStack: ItemStack): Boolean{
+            return isFood(itemStack) && containerOrNull(itemStack) == null
         }
     }
 }

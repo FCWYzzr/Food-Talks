@@ -2,6 +2,7 @@ package indi.fcwyzzr.minecraft.food_talks.common.event.gameplay
 
 import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
+import indi.fcwyzzr.minecraft.food_talks.common.effects.harmful.Anorexia
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -27,7 +28,9 @@ object CompoundFoodEatingHandler {
 
 
         val entity = tick.entity
-        if (item.uponBite(itemStack, entity) && itemStack.damageValue < itemStack.maxDamage)
+        if (itemStack.damageValue < itemStack.maxDamage
+            && item.uponBite(itemStack, entity)
+            && Anorexia.canEat(itemStack, entity))
             tick.duration += chewTick
         else
             tick.isCanceled = true

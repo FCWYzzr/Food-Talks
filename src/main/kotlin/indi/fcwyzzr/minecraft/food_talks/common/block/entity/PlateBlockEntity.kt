@@ -2,6 +2,7 @@ package indi.fcwyzzr.minecraft.food_talks.common.block.entity
 
 import com.mojang.logging.LogUtils
 import indi.fcwyzzr.minecraft.f_lib.registry.FRegistry
+import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
 import indi.fcwyzzr.minecraft.food_talks.common.block.PlateBlock
 import indi.fcwyzzr.minecraft.food_talks.common.registries.sandwichCover
 import indi.fcwyzzr.minecraft.food_talks.toRegistryName
@@ -63,17 +64,21 @@ class PlateBlockEntity(
             return false
         if (size == MAX_LAYER)
             return false
-        if (itemStack.components[DataComponents.FOOD] == null)
+
+        if (!CompoundFood.isHandHoldFood(itemStack))
             return false
 
-        // todo add seasonings(next version)
-        if (itemStack.components[DataComponents.FOOD]!!.usingConvertsTo.isPresent)
-            return false
+        // 1. last cover
+        if (size == MAX_LAYER - 1)
+            return addCover(itemStack.copyWithCount(1))
 
-        if (size == 0 || size == MAX_LAYER - 1)
+        // 2. first layer
+        if (size == 0)
             return addCover(itemStack.copyWithCount(1))
                     || pushDisplay(itemStack.copyWithCount(1))
 
+        // 3.others
+        // todo add seasonings(next version)
         ingredient.addLast(itemStack.copyWithCount(1))
         setChanged()
         return true
@@ -89,6 +94,7 @@ class PlateBlockEntity(
         setChanged()
         return true
     }
+
     fun popDisplay(): ItemStack? {
         val pop = display
         display = null

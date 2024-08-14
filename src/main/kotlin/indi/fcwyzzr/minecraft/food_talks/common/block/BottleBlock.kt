@@ -17,6 +17,7 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.ItemInteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.ItemUtils
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.level.*
@@ -181,8 +182,17 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
                     ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
                 else if (! entity.detoxify()) {
                     val newState = state.setValue(PROPERTY_FILL_LEVEL, fillLevel+1)
-                    if (!player.hasInfiniteMaterials())
-                        player.setItemInHand(hand, Items.GLASS_BOTTLE.defaultInstance)
+                    if (!player.hasInfiniteMaterials()) {
+                        val newStack = ItemUtils.createFilledResult(
+                            stack, player, Items.GLASS_BOTTLE.defaultInstance
+                        )
+                        if (newStack !== stack)
+                            player.setItemInHand(
+                                hand, newStack
+                            )
+                    }
+
+
                     ItemInteractionResult.SUCCESS to newState
                 }
                 else
@@ -195,7 +205,7 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
                 else{
                     entity.upgrade()
                     if (!player.hasInfiniteMaterials())
-                        player.setItemInHand(hand, ItemStack.EMPTY)
+                        stack.shrink(1)
                     ItemInteractionResult.SUCCESS to state
                 }
             }
@@ -206,7 +216,7 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
                 else{
                     entity.extend()
                     if (!player.hasInfiniteMaterials())
-                        player.setItemInHand(hand, ItemStack.EMPTY)
+                        stack.shrink(1)
                     ItemInteractionResult.SUCCESS to state
                 }
             }
@@ -223,8 +233,14 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
                         .allEffects
                     )
 
-                    if (!player.hasInfiniteMaterials())
-                        player.setItemInHand(hand, Items.GLASS_BOTTLE.defaultInstance)
+                    if (!player.hasInfiniteMaterials()){
+                        val newStack = ItemUtils.createFilledResult(
+                            stack, player, Items.GLASS_BOTTLE.defaultInstance
+                        )
+                        if (newStack !== stack)
+                            player.setItemInHand(hand, newStack)
+                    }
+
                     ItemInteractionResult.SUCCESS to newState
                 }
             }
