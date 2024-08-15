@@ -4,7 +4,7 @@ import indi.fcwyzzr.minecraft.f_lib.registry.FItem
 import indi.fcwyzzr.minecraft.f_lib.utils.buildDataComponentPatch
 import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodItemProperties
-import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodStackProperties
+import indi.fcwyzzr.minecraft.food_talks.common.effects.harmful.Anorexia
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponents
@@ -12,15 +12,15 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResultHolder
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.food.FoodProperties
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.UseAnim
 import net.minecraft.world.level.Level
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 abstract class CompoundFood(
-    bitesNeed: Int,
     chewSeconds: Float,
+    bitesNeed: Int = 1,
     useConvertsTo: ItemStack? = null,
     canAlwaysEat: Boolean = false
 ): FItem(Properties().apply {
@@ -39,8 +39,8 @@ abstract class CompoundFood(
     override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 5 + chewTick(stack)
     override fun use(level: Level, player: Player, usedHand: InteractionHand): InteractionResultHolder<ItemStack> {
         val itemStack = player.getItemInHand(usedHand)
-        if (!player.canEat(itemStack.components[FoodItemProperties.type]!!.canAlwaysEat))
-            return InteractionResultHolder.pass(itemStack)
+        if (!Anorexia.canEat(itemStack, player))
+            return InteractionResultHolder.fail(itemStack)
         player.startUsingItem(usedHand)
         return InteractionResultHolder.success(itemStack)
     }
@@ -48,33 +48,10 @@ abstract class CompoundFood(
     /**
      * @return: boolean: should continue eating?
      */
-    abstract fun uponBite(itemStack: ItemStack, biteCount: Int, entity: LivingEntity): Boolean
-
-    override fun onUseTick(level: Level, entity: LivingEntity, itemStack: ItemStack, remainingUseDuration: Int) {
-        val tick = 72000 - remainingUseDuration
-        if (tick <= 20 || tick % 20 != 1)
-            return
-
-        if (uponBite(itemStack, tick / 20 - 1, entity)){
-            itemStack.damageValue += 1
-            return
-        }
-    }
+    abstract fun uponBite(itemStack: ItemStack, entity: LivingEntity): Boolean
 
     open fun buildItemStack(action: DataComponentPatch.Builder.() -> Unit): ItemStack{
-        val itemProperty: FoodItemProperties = this.components()[FoodItemProperties.type]!!
-        val stackProperty: FoodStackProperties? = this.components()[FoodStackProperties.type]
-
         val itemStack = ItemStack(Holder.direct(this), 1, buildDataComponentPatch {
-            set(DataComponents.FOOD, FoodProperties(
-                stackProperty ?.nutrition ?: 0,
-                stackProperty ?.saturation ?: 0F,
-                itemProperty.canAlwaysEat,
-                itemProperty.chewSeconds,
-                itemProperty.convertsTo,
-                listOf()
-            ))
-
             this.action()
         })
 
@@ -82,6 +59,31 @@ abstract class CompoundFood(
     }
 
     override fun finishUsingItem(stack: ItemStack, level: Level, livingEntity: LivingEntity): ItemStack {
+        if (stack.damageValue < stack.maxDamage)
+            return stack
         return stack.components[FoodItemProperties.type]!!.convertsTo.orElse(ItemStack.EMPTY)
+    }
+
+    companion object{
+        fun isFood(itemStack: ItemStack): Boolean{
+            return itemStack.components.has(DataComponents.FOOD) || itemStack.item is CompoundFood
+        }
+
+        fun containerOrNull(itemStack: ItemStack): ItemStack? {
+            if (!isFood(itemStack))
+                return null
+            return itemStack.components
+                .let {
+                    it[DataComponents.FOOD]
+                        ?.usingConvertsTo
+                        ?: it[FoodItemProperties.type]
+                            ?.convertsTo
+
+                }?.getOrNull()
+        }
+
+        fun isHandHoldFood(itemStack: ItemStack): Boolean{
+            return isFood(itemStack) && containerOrNull(itemStack) == null
+        }
     }
 }

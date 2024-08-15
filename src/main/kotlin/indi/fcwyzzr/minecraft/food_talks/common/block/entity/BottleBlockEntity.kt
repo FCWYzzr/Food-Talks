@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.BlockState
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.RegisterEvent
 import org.slf4j.Logger
+import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 
 class BottleBlockEntity(
@@ -39,10 +40,10 @@ class BottleBlockEntity(
 
     private val contents = mutableMapOf<Holder<MobEffect>, MobEffectInstance>()
 
-    fun addPotion(effects: Collection<MobEffectInstance>){
+    fun addPotion(effects: Iterable<MobEffectInstance>){
+        setChanged()
         waterLevel ++
         effects
-            .asSequence()
             .map { it.effect to it }
             .map { (effect, instance) ->
                 effect to mergeMobEffectInstance(
@@ -62,16 +63,18 @@ class BottleBlockEntity(
 
     fun upgrade(){
         upgrade ++
+        setChanged()
     }
 
     fun extend(){
         extend ++
+        setChanged()
     }
 
     fun detoxify(): Boolean{
         if (detoxified)
             return false
-
+        setChanged()
         detoxified = true
         return true
     }
@@ -82,12 +85,12 @@ class BottleBlockEntity(
         super.loadAdditional(tag, registries)
         contents.clear()
 
+        waterLevel = tag.getInt("water_level")
         detoxified = tag.getBoolean("detoxified")
         upgrade = tag.getInt("upgrade")
         extend = tag.getInt("extend")
 
         tag.getList("contents", 10)
-            .asSequence()
             .map {
                 MobEffectInstance.CODEC.parse(
                     registries.createSerializationContext(NbtOps.INSTANCE),
@@ -95,9 +98,7 @@ class BottleBlockEntity(
                 ).resultOrPartial { name ->
                     LOGGER.error("Tried to load invalid item: '{}'", name)
                 }
-            }.mapNotNull {
-                it.getOrNull()
-            }
+            }.mapNotNull(Optional<MobEffectInstance>::getOrNull)
             .forEach{
                 contents[it.effect] = it
             }
@@ -106,7 +107,7 @@ class BottleBlockEntity(
     override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
         super.saveAdditional(tag, registries)
         val contentTag = ListTag().apply {
-            contents.asSequence()
+            contents.asIterable()
                 .map {
                     MobEffectInstance.CODEC.encodeStart(
                         registries.createSerializationContext(NbtOps.INSTANCE),
@@ -116,6 +117,7 @@ class BottleBlockEntity(
                 .forEach(::add)
         }
 
+        tag.putInt("water_level", waterLevel)
         tag.putInt("upgrade", upgrade)
         tag.putBoolean("detoxified", detoxified)
         tag.put("contents", contentTag)

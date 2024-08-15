@@ -6,6 +6,8 @@ import net.minecraft.core.Holder
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.effect.MobEffect
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.item.Item
 import net.neoforged.neoforge.registries.DeferredHolder
 
 abstract class FoodItemReward(
@@ -25,4 +27,27 @@ abstract class FoodItemReward(
 
     abstract fun extendTime(ingredientCount: Int): Int
     abstract fun amplifier(ingredientCount: Int): Int
+
+    operator fun invoke(ingredientCount: Int) =
+        MobEffectInstance(effect, extendTime(ingredientCount), amplifier(ingredientCount))
+
+    companion object {
+        fun countBased(
+            key: ResourceKey<Item>,
+            effect: Holder<MobEffect>,
+            duration: Int,
+            amplifier: Int = 0,
+            multiplyTime: Boolean = true,
+            multiplyAmplifier: Boolean = true
+            ) = object: FoodItemReward(
+            key.location(),
+            effect
+        ){
+            override fun extendTime(ingredientCount: Int) = duration *
+                    if (multiplyTime) ingredientCount - 1 else 0
+
+            override fun amplifier(ingredientCount: Int) = amplifier *
+                    if (multiplyAmplifier) ingredientCount - 1 else 0
+        }
+    }
 }

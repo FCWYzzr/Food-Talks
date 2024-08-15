@@ -5,10 +5,11 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentContents
 import net.minecraft.network.chat.MutableComponent
 
-fun buildDataComponentPatch(action: DataComponentPatch.Builder.() -> Unit): DataComponentPatch = DataComponentPatch
-    .builder()
-    .apply(action)
-    .build()
+fun buildDataComponentPatch(action: DataComponentPatch.Builder.() -> Unit): DataComponentPatch {
+    return DataComponentPatch.builder()
+        .apply(action)
+        .build()
+}
 
 fun buildComponent(content: ComponentContents, actions: MutableComponent.() -> Unit={}): Component {
     val component = MutableComponent.create(content)

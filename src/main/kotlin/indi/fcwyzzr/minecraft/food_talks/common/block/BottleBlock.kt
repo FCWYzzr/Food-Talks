@@ -3,7 +3,6 @@ package indi.fcwyzzr.minecraft.food_talks.common.block
 import indi.fcwyzzr.minecraft.f_lib.registry.FRegistry
 import indi.fcwyzzr.minecraft.food_talks.common.block.entity.BottleBlockEntity
 import indi.fcwyzzr.minecraft.food_talks.common.item.Cocktail
-import indi.fcwyzzr.minecraft.food_talks.toMobEffectInstanceList
 import indi.fcwyzzr.minecraft.food_talks.toRegistryName
 import indi.fcwyzzr.minecraft.food_talks.toResourceLocation
 import net.minecraft.core.BlockPos
@@ -14,30 +13,33 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.ItemInteractionResult
-import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.ItemUtils
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.level.*
-import net.minecraft.world.level.block.*
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.EntityBlock
+import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.RegisterEvent
-import thedarkcolour.kotlinforforge.neoforge.forge.vectorutil.v3d.toVec3
 
 class BottleBlock private constructor(): Block(Properties.of().apply {
     instabreak()
     explosionResistance(0F)
-    // noTerrainParticles()
     sound(SoundType.GLASS)
     noCollission()
     noOcclusion()
@@ -122,9 +124,32 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
 
     private fun doDestroyDrop(level: Level, entity: BottleBlockEntity, fillLevel: Int){
         val itemStack = Cocktail.buildFromBottle(entity, fillLevel)
-        val spawnPos = entity.blockPos.toVec3()
-        val itemEntity = ItemEntity(level, spawnPos.x, spawnPos.y, spawnPos.z, itemStack)
-        level.addFreshEntity(itemEntity)
+        popResource(level, entity.blockPos, itemStack)
+    }
+
+    /**
+     * shift click take
+     */
+    override fun useWithoutItem(
+        state: BlockState,
+        level: Level,
+        pos: BlockPos,
+        player: Player,
+        hitResult: BlockHitResult
+    ): InteractionResult {
+        if (! player.isShiftKeyDown)
+            return InteractionResult.PASS
+
+        doDestroyDrop(
+            level,
+            level.getBlockEntity(pos) as BottleBlockEntity,
+            state.getValue(PROPERTY_FILL_LEVEL)
+        )
+
+        if (!player.hasInfiniteMaterials())
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState())
+
+        return InteractionResult.SUCCESS
     }
 
     override fun useItemOn(
@@ -149,68 +174,93 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
         val fillLevel = state.getValue(PROPERTY_FILL_LEVEL)
         val entity = level.getBlockEntity(pos) as BottleBlockEntity
 
-        val result = when{
+        val (result, newState) = when{
             stack.`is`(Items.HONEY_BOTTLE) -> {
                 if (fillLevel == MAX_FILL_LEVEL)
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
                 else if (!entity.allowNewCondiment(2))
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
                 else if (! entity.detoxify()) {
                     val newState = state.setValue(PROPERTY_FILL_LEVEL, fillLevel+1)
-                    level.setBlockAndUpdate(pos, newState)
-                    if (!player.hasInfiniteMaterials())
-                        player.setItemInHand(hand, Items.GLASS_BOTTLE.defaultInstance)
-                    ItemInteractionResult.SUCCESS
+                    if (!player.hasInfiniteMaterials()) {
+                        val newStack = ItemUtils.createFilledResult(
+                            stack, player, Items.GLASS_BOTTLE.defaultInstance
+                        )
+                        if (newStack !== stack)
+                            player.setItemInHand(
+                                hand, newStack
+                            )
+                    }
+
+
+                    ItemInteractionResult.SUCCESS to newState
                 }
                 else
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
             }
 
             stack.`is`(Items.GLOWSTONE_DUST) -> {
                 if (!entity.allowNewCondiment(1))
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
                 else{
                     entity.upgrade()
                     if (!player.hasInfiniteMaterials())
-                        player.setItemInHand(hand, ItemStack.EMPTY)
-                    ItemInteractionResult.SUCCESS
+                        stack.shrink(1)
+                    ItemInteractionResult.SUCCESS to state
                 }
             }
 
             stack.`is`(Items.REDSTONE) -> {
                 if (!entity.allowNewCondiment(1))
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
                 else{
                     entity.extend()
                     if (!player.hasInfiniteMaterials())
-                        player.setItemInHand(hand, ItemStack.EMPTY)
-                    ItemInteractionResult.SUCCESS
+                        stack.shrink(1)
+                    ItemInteractionResult.SUCCESS to state
                 }
             }
 
             else -> {
                 if (fillLevel == MAX_FILL_LEVEL)
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
                 else {
                     val newState = state.setValue(PROPERTY_FILL_LEVEL, fillLevel+1)
-                    level.setBlockAndUpdate(pos, newState)
 
                     entity.addPotion((stack
                         .components[DataComponents.POTION_CONTENTS]
-                        ?: PotionContents.EMPTY).toMobEffectInstanceList()
+                        ?: PotionContents.EMPTY)
+                        .allEffects
                     )
 
-                    if (!player.hasInfiniteMaterials())
-                        player.setItemInHand(hand, Items.GLASS_BOTTLE.defaultInstance)
-                    ItemInteractionResult.SUCCESS
+                    if (!player.hasInfiniteMaterials()){
+                        val newStack = ItemUtils.createFilledResult(
+                            stack, player, Items.GLASS_BOTTLE.defaultInstance
+                        )
+                        if (newStack !== stack)
+                            player.setItemInHand(hand, newStack)
+                    }
+
+                    ItemInteractionResult.SUCCESS to newState
                 }
             }
         }
 
+        if (newState !== null)
+            level.setBlockAndUpdate(pos, newState)
+
         return result
     }
 
-
+    override fun getCloneItemStack(
+        state: BlockState,
+        target: HitResult,
+        level: LevelReader,
+        pos: BlockPos,
+        player: Player
+    ): ItemStack {
+        return Items.GLASS_BOTTLE.defaultInstance
+    }
 
 
     companion object: FRegistry<Block>{

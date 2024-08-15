@@ -4,9 +4,7 @@ import indi.fcwyzzr.minecraft.f_lib.utils.buildComponent
 import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
 import indi.fcwyzzr.minecraft.food_talks.common.block.entity.BottleBlockEntity
-import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodStackProperties
-import indi.fcwyzzr.minecraft.food_talks.common.mixin.accessors.LivingEntityAccessor
-import indi.fcwyzzr.minecraft.food_talks.common.mixin.accessors.MobEffectInstanceAccessor
+import indi.fcwyzzr.minecraft.food_talks.common.mixin.accessors.mechanic.MobEffectInstanceAccessor
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.contents.PlainTextContents.LiteralContents
@@ -24,35 +22,35 @@ import java.time.Duration
 import java.util.*
 
 object Cocktail: CompoundFood(
-    16,
-    1F,
+    0.25F,
+    1,
     Items.GLASS_BOTTLE.defaultInstance,
     true
 ) {
 
-     override fun getUseAnimation(stack: ItemStack) = UseAnim.DRINK
+    override fun getUseAnimation(stack: ItemStack) = UseAnim.DRINK
 
-    override fun uponBite(itemStack: ItemStack, biteCount: Int, entity: LivingEntity): Boolean {
+    fun mergePotionContent(addonEffect: Iterable<MobEffectInstance>?, entity: LivingEntity){
         val baseEffectMap = entity.activeEffectsMap
-        val addonEffectMap = itemStack[DataComponents.POTION_CONTENTS]
-            ?.allEffects
-            ?.asSequence()
-            ?.map { it.effect to it }
-            ?.toMap()
+        val addonEffectMap = addonEffect
+            ?.associate { it.effect to it }
+            ?: return
 
-            ?: return true
+        val effects = computedAddonMobEffect(addonEffectMap, baseEffectMap)
 
         removalWhenMergeMobEffectMap(addonEffectMap, baseEffectMap)
-            .forEach {
-                val mobEffectInstance: MobEffectInstance? = entity.removeEffectNoUpdate(it)
-                (entity as LivingEntityAccessor).onEffectRemoved(mobEffectInstance)
-            }
+            .forEach(entity::removeEffect)
 
-        computedAddonMobEffect(addonEffectMap, baseEffectMap)
-            .forEach {
-                entity.addEffect(it, entity)
-            }
 
+        effects.forEach {
+            entity.addEffect(it, entity)
+        }
+    }
+
+    override fun uponBite(itemStack: ItemStack, entity: LivingEntity): Boolean {
+        val addonEffect = itemStack[DataComponents.POTION_CONTENTS]
+        if (!entity.level().isClientSide)
+            mergePotionContent(addonEffect ?.allEffects , entity)
         return true
     }
 
@@ -60,13 +58,11 @@ object Cocktail: CompoundFood(
         if (fillLevel == 0)
             return Items.GLASS_BOTTLE.defaultInstance
 
-        val damage = (8 - fillLevel) * 2
         val amplifierAddon = entity.upgrade
         val timeMultiplier = entity.extend
         val harmFilter = entity.detoxified
 
         val potionContents = entity.dumpContents()
-            .asSequence()
             .filter {
                 if (harmFilter)
                     it.effect.value().category != MobEffectCategory.HARMFUL
@@ -77,8 +73,8 @@ object Cocktail: CompoundFood(
                 if (timeMultiplier == 0 && amplifierAddon == 0)
                     it
                 else {
-                val time = it.duration * (timeMultiplier + 1) / 4
-                    val amplifier = it.amplifier + amplifierAddon
+                val time = it.duration * (timeMultiplier + 1) / 16
+                    val amplifier = it.amplifier + 1 + amplifierAddon
                     MobEffectInstance(it.effect, time, amplifier)
                 }
             }
@@ -88,6 +84,10 @@ object Cocktail: CompoundFood(
 
         return  buildItemStack {
             set(
+                DataComponents.MAX_DAMAGE,
+                fillLevel * 8
+            )
+            set(
                 DataComponents.POTION_CONTENTS,
                 PotionContents(
                     Optional.empty(),
@@ -95,16 +95,10 @@ object Cocktail: CompoundFood(
                     potionContents
                 )
             )
-            set(
-                FoodStackProperties.type,
-                FoodStackProperties(
-                    1, 0.5F
-                )
-            )
 
             set(
                 DataComponents.DAMAGE,
-                damage
+                0
             )
 
             set(
@@ -117,18 +111,19 @@ object Cocktail: CompoundFood(
 
     fun mergeMobEffectInstance(addon: MobEffectInstance, base: MobEffectInstance?): MobEffectInstance {
         return when {
-            base === null -> addon
-            addon.amplifier > base.amplifier -> mergeMobEffectInstance(base, addon)
-            addon.amplifier == base.amplifier -> MobEffectInstance(
-                base.effect,
-                base.duration + addon.duration,
-                base.amplifier
-            )
-            addon.amplifier < base.amplifier -> MobEffectInstance(
-                base.effect,
-                base.duration + addon.duration * base.amplifier / addon.amplifier,
-                base.amplifier
-            )
+            base === null -> MobEffectInstance(addon)
+            addon.amplifier > base.amplifier -> mergeMobEffectInstance(base, MobEffectInstance(addon))
+            addon.amplifier == base.amplifier -> {
+                (base as MobEffectInstanceAccessor)
+                    .setDuration(base.duration + addon.duration)
+
+                base
+            }
+            addon.amplifier < base.amplifier -> {
+                (base as MobEffectInstanceAccessor)
+                    .setDuration(base.duration + addon.duration * (base.amplifier + 1) / (addon.amplifier + 1))
+                base
+            }
 
             else -> throw Error("???")
         }
@@ -137,7 +132,7 @@ object Cocktail: CompoundFood(
     private fun mergeCollapsedMobEffectInstance(self: MobEffectInstance): MobEffectInstance{
         val hidden = (self as MobEffectInstanceAccessor).hiddenEffect ?: return self
 
-        val mergedHidden = mergeCollapsedMobEffectInstance(hidden)
+        val mergedHidden = mergeCollapsedMobEffectInstance(MobEffectInstance(hidden))
 
         return mergeMobEffectInstance(mergedHidden, self)
     }
@@ -155,26 +150,20 @@ object Cocktail: CompoundFood(
     ) = buildList {
         val changesKey = removalWhenMergeMobEffectMap(addonMap, baseMap)
         val hiddenMergedRemoval = changesKey
-            .asSequence()
-            .map(baseMap::get)
-            .filterNotNull()
+            .mapNotNull(baseMap::get)
             .map(::mergeCollapsedMobEffectInstance)
-            .map { it.effect to it }
-            .toMap()
+            .associateBy { it.effect }
 
         changesKey
-            .asSequence()
-            .map(addonMap::get)
-            .filterNotNull()
+            .mapNotNull(addonMap::get)
             .map { mergeMobEffectInstance(
                 it, hiddenMergedRemoval[it.effect]
             )}
             .toCollection(this)
 
         addonMap
-            .asSequence()
             .filterNot { it.key in changesKey }
-            .map(Map.Entry<Holder<MobEffect>, MobEffectInstance>::value)
+            .map { MobEffectInstance(it.value) }
             .toCollection(this)
 
     }
@@ -192,10 +181,10 @@ object Cocktail: CompoundFood(
 
 
                 append(buildComponent(LiteralContents(
-                    "  §f=§r §f§o%d§r".format(it.amplifier+1)
+                    " §3<%d>§r".format(it.amplifier+1)
                 )))
                 append(buildComponent(LiteralContents(
-                    "  §f+§r §f%02d:%02d:%02d§r".format(
+                    " §9[%02d:%02d:%02d]§r".format(
                         time.toHours(),
                         time.toMinutesPart(),
                         time.toSecondsPart()
