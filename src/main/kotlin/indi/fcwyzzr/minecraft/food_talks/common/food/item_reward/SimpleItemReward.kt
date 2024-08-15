@@ -42,7 +42,7 @@ val goldenAppleIsForGoddess = FoodItemReward.countBased(
 
 val enchantedGoldenAppleIsForRealGod = FoodItemReward.countBased(
     Items.ENCHANTED_GOLDEN_APPLE.toResourceKey(),
-    MojangGrace.holder, 10 * FoodTalks.TPS
+    GameGrace.holder, 10 * FoodTalks.TPS
 )
 // gives you nothing: poisonous potato; rotten_flesh; spider_eye
 // </drugs>

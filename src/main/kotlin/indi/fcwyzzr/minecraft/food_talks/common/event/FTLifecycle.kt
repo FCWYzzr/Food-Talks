@@ -116,7 +116,7 @@ object FTLifecycle {
         event doRegister PoisonResistance
         event doRegister DarknessInfused
         event doRegister GoddessGrace
-        event doRegister MojangGrace
+        event doRegister GameGrace
         event doRegister Smelly
         event doRegister Happy
         event doRegister ProjectileImmune

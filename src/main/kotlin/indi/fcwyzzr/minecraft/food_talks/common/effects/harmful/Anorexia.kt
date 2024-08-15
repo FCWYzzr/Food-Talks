@@ -3,6 +3,7 @@ package indi.fcwyzzr.minecraft.food_talks.common.effects.harmful
 import indi.fcwyzzr.minecraft.f_lib.registry.FMobEffect
 import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodItemProperties
+import indi.fcwyzzr.minecraft.food_talks.common.effects.beneficial.Starving
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.Difficulty
 import net.minecraft.world.effect.MobEffectCategory
@@ -49,12 +50,14 @@ object Anorexia: FMobEffect(
         if (entity.hasEffect(Anorexia.holder))
             return false
 
-        return (entity !is Player) || entity.canEat(
+        return (entity !is Player)
+                || entity.hasEffect(Starving.holder)
+                || entity.canEat(
             itemStack.components[DataComponents.FOOD]
-                ?.canAlwaysEat
-                ?: itemStack.components[FoodItemProperties.type]
-                    ?.canAlwaysEat
-                    ?: false
+                        ?.canAlwaysEat
+                        ?: itemStack.components[FoodItemProperties.type]
+                            ?.canAlwaysEat
+                            ?: false
         )
     }
 }

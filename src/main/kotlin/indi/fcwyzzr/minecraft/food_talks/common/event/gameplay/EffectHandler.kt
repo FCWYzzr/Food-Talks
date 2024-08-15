@@ -152,7 +152,7 @@ object EffectHandler {
                 }
             }
 
-        attacker.getEffect(MojangGrace.holder)
+        attacker.getEffect(GameGrace.holder)
             ?.amplifier
             ?.plus(1)
             ?.let { graceLevel ->
@@ -217,7 +217,7 @@ object EffectHandler {
             }
 
 
-        val chance = miner.getEffect(MojangGrace.holder)
+        val chance = miner.getEffect(GameGrace.holder)
             ?.amplifier
             ?.plus(1)
             ?.apply {

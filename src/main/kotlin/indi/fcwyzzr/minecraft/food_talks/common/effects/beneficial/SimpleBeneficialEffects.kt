@@ -53,7 +53,7 @@ object GoddessGrace: FMobEffect(
     MobEffectCategory.BENEFICIAL, 0xffff00
 )
 
-object MojangGrace: FMobEffect(
+object GameGrace: FMobEffect(
     MobEffectCategory.BENEFICIAL, 0xffff00
 )
 
