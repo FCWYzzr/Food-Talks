@@ -1,4 +1,4 @@
-package indi.fcwyzzr.minecraft.food_talks.common.effects.beneficial
+package indi.fcwyzzr.minecraft.food_talks.common.mob_effect.beneficial
 
 import indi.fcwyzzr.minecraft.f_lib.registry.FMobEffect
 import indi.fcwyzzr.minecraft.food_talks.toResourceLocation

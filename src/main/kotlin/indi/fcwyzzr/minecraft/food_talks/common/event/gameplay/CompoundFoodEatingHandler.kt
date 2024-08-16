@@ -2,7 +2,7 @@ package indi.fcwyzzr.minecraft.food_talks.common.event.gameplay
 
 import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
-import indi.fcwyzzr.minecraft.food_talks.common.effects.harmful.Anorexia
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful.Anorexia
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber

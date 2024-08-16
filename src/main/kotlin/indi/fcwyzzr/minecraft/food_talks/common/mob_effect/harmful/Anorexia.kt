@@ -1,9 +1,9 @@
-package indi.fcwyzzr.minecraft.food_talks.common.effects.harmful
+package indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful
 
 import indi.fcwyzzr.minecraft.f_lib.registry.FMobEffect
 import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodItemProperties
-import indi.fcwyzzr.minecraft.food_talks.common.effects.beneficial.Starving
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.beneficial.Starving
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.Difficulty
 import net.minecraft.world.effect.MobEffectCategory

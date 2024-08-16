@@ -4,7 +4,7 @@ import indi.fcwyzzr.minecraft.f_lib.registry.FItem
 import indi.fcwyzzr.minecraft.f_lib.utils.buildDataComponentPatch
 import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodItemProperties
-import indi.fcwyzzr.minecraft.food_talks.common.effects.harmful.Anorexia
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful.Anorexia
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponents

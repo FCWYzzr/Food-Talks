@@ -1,4 +1,4 @@
-package indi.fcwyzzr.minecraft.food_talks.common.effects.harmful
+package indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful
 
 import indi.fcwyzzr.minecraft.f_lib.registry.FMobEffect
 import net.minecraft.client.multiplayer.ClientLevel

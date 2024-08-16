@@ -1,4 +1,4 @@
-package indi.fcwyzzr.minecraft.food_talks.common.effects.harmful
+package indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful
 
 import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.f_lib.registry.FMobEffect
@@ -12,8 +12,6 @@ import net.minecraft.world.entity.player.Player
 
 /**
  * apply to non-peaceful player
- *
- * <milk irremovable>
  *
  * every 20 tick, player has 1/5 chance to receive 2 damage, effected by difficulty
  */

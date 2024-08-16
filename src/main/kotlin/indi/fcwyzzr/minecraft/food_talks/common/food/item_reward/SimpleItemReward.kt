@@ -2,7 +2,7 @@ package indi.fcwyzzr.minecraft.food_talks.common.food.item_reward
 
 import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.api.common.registry.FoodItemReward
-import indi.fcwyzzr.minecraft.food_talks.common.effects.beneficial.*
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.beneficial.*
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.item.Item
