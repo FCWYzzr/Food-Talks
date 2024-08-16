@@ -1,6 +1,6 @@
 package indi.fcwyzzr.minecraft.food_talks.common.mixin.tweaks.mechanic;
 
-import indi.fcwyzzr.minecraft.food_talks.common.effects.beneficial.Happy;
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.beneficial.Happy;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;

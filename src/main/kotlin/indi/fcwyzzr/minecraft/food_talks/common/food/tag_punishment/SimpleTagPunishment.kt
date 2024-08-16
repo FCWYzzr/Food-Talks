@@ -2,7 +2,7 @@ package indi.fcwyzzr.minecraft.food_talks.common.food.tag_punishment
 
 import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.api.common.registry.FoodTagPunishment
-import indi.fcwyzzr.minecraft.food_talks.common.effects.harmful.*
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful.*
 import indi.fcwyzzr.minecraft.food_talks.toResourceLocation
 import net.minecraft.world.effect.MobEffects
 

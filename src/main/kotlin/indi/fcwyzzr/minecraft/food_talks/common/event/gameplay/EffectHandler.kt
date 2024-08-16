@@ -3,10 +3,11 @@ package indi.fcwyzzr.minecraft.food_talks.common.event.gameplay
 import com.google.common.math.IntMath.pow
 import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
-import indi.fcwyzzr.minecraft.food_talks.common.effects.beneficial.*
-import indi.fcwyzzr.minecraft.food_talks.common.effects.harmful.*
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.beneficial.*
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful.*
 import indi.fcwyzzr.minecraft.food_talks.common.registries.ToothacheDamage
 import indi.fcwyzzr.minecraft.food_talks.common.registries.from
+import indi.fcwyzzr.minecraft.food_talks.common.registries.milkIrremovable
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
@@ -39,13 +40,7 @@ object EffectHandler {
     @SubscribeEvent
     fun entityTryToRemoveEffect(event: Remove){
         if (event.cure != null)
-            if (event.effect.`is`(Anorexia.location)
-                || event.effect.`is`(Gout.location)
-                || event.effect.`is`(Overweight.location)
-                || event.effect.`is`(Toothache.location)
-                || event.effect.`is`(Vomit.location)
-            )
-
+            if (event.effect.`is`(milkIrremovable))
                 event.isCanceled = true
     }
 
