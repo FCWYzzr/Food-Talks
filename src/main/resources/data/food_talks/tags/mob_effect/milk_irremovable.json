@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "food_talks:anorexia",
+    "food_talks:vomit",
+    "food_talks:overweight",
+
+    "food_talks:goddess_grace",
+    "food_talks:game_grace"
+  ]
+}
