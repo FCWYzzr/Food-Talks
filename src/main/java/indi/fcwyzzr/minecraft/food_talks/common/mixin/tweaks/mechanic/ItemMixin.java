@@ -1,7 +1,7 @@
 package indi.fcwyzzr.minecraft.food_talks.common.mixin.tweaks.mechanic;
 
 import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood;
-import indi.fcwyzzr.minecraft.food_talks.common.effects.harmful.Anorexia;
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful.Anorexia;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;

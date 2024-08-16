@@ -1,7 +1,7 @@
 package indi.fcwyzzr.minecraft.food_talks.common.mixin.tweaks.mechanic;
 
-import indi.fcwyzzr.minecraft.food_talks.common.effects.beneficial.ProjectileImmune;
-import indi.fcwyzzr.minecraft.food_talks.common.effects.harmful.Overweight;
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.beneficial.ProjectileImmune;
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful.Overweight;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;

@@ -1,7 +1,7 @@
 package indi.fcwyzzr.minecraft.food_talks.common.mixin.tweaks.mechanic;
 
 import indi.fcwyzzr.minecraft.food_talks.common.ai.goal.ConditionallyAvoidEntityGoal;
-import indi.fcwyzzr.minecraft.food_talks.common.effects.beneficial.Smelly;
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.beneficial.Smelly;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
