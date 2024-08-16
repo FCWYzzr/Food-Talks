@@ -6,7 +6,6 @@ import indi.fcwyzzr.minecraft.food_talks.client.renderer.Bewlr
 import indi.fcwyzzr.minecraft.food_talks.common.block.entity.PlateBlockEntity
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.SimpleDataComponents
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodStackProperties
-import indi.fcwyzzr.minecraft.food_talks.common.effects.harmful.Anorexia
 import indi.fcwyzzr.minecraft.food_talks.common.mixin.accessors.mechanic.MobEffectInstanceAccessor
 import indi.fcwyzzr.minecraft.food_talks.common.registries.foodItemRewardRegistry
 import indi.fcwyzzr.minecraft.food_talks.common.registries.foodTagPunishmentRegistry
