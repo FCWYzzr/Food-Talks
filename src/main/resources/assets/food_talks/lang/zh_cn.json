@@ -1,4 +1,22 @@
 {
+  "item.food_talks.cocktail": "鸡尾酒",
+  "block.food_talks.bottle_block": "玻璃瓶",
+  "block.food_talks.plate_block": "木盘子",
+  "item.food_talks.Plate": "木盘子",
+  "item.food_talks.sandwich": "三明治",
+  "effect.food_talks.poison_resistance": "剧毒抗性",
+  "effect.food_talks.darkness_infused": "黑暗浸染",
+  "effect.food_talks.goddess_grace": "女神的恩惠",
+  "effect.food_talks.game_grace": "游戏的恩惠",
+  "effect.food_talks.smelly": "膻骚",
+  "effect.food_talks.happy": "开心",
+  "effect.food_talks.projectile_immune": "弹射物免疫",
+  "effect.food_talks.starving": "饥荒",
+  "effect.food_talks.jack_head": "替身",
+
   "effect.food_talks.anorexia": "厌食症",
-  "item.food_talks.cocktail": "鸡尾酒"
+  "effect.food_talks.gout": "痛风",
+  "effect.food_talks.vomit": "呕吐",
+  "effect.food_talks.toothache": "牙痛",
+  "effect.food_talks.overweight": "肥胖"
 }

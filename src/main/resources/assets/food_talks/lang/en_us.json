@@ -1,4 +1,24 @@
 {
+  "block.food_talks.bottle_block": "Glass Bottle",
+  "block.food_talks.plate_block": "Wooden Plate",
+  "item.food_talks.cocktail": "Cocktail",
+  "item.food_talks.Plate": "Wooden Plate",
+  "item.food_talks.sandwich": "Sandwich",
+
+  "effect.food_talks.poison_resistance": "Poison Resistance",
+  "effect.food_talks.darkness_infused": "Darkness Infused",
+  "effect.food_talks.goddess_grace": "Goddess Grace",
+  "effect.food_talks.game_grace": "Game Grace",
+  "effect.food_talks.smelly": "Smelly",
+  "effect.food_talks.happy": "Happiness",
+  "effect.food_talks.projectile_immune": "Projectile Immunity",
+  "effect.food_talks.starving": "Starving",
+  "effect.food_talks.jack_head": "Head' o Jack",
+
   "effect.food_talks.anorexia": "Anorexia",
-  "item.food_talks.cocktail": "Cocktail"
+  "effect.food_talks.gout": "Gout",
+  "effect.food_talks.vomit": "Vomit",
+  "effect.food_talks.toothache": "Toothache",
+  "effect.food_talks.overweight": "Overweight"
+
 }
