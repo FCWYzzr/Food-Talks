@@ -9,8 +9,8 @@ import indi.fcwyzzr.minecraft.food_talks.common.block.entity.PlateBlockEntity
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.SimpleDataComponents
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodItemProperties
 import indi.fcwyzzr.minecraft.food_talks.common.data_component.compound_food.FoodStackProperties
-import indi.fcwyzzr.minecraft.food_talks.common.effects.beneficial.*
-import indi.fcwyzzr.minecraft.food_talks.common.effects.harmful.*
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.beneficial.*
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful.*
 import indi.fcwyzzr.minecraft.food_talks.common.food.item_reward.*
 import indi.fcwyzzr.minecraft.food_talks.common.food.tag_punishment.*
 import indi.fcwyzzr.minecraft.food_talks.common.item.Cocktail
