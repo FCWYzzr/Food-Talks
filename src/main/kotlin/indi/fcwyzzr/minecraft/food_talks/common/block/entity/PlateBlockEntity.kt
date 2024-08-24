@@ -65,7 +65,8 @@ class PlateBlockEntity(
         if (size == MAX_LAYER)
             return false
 
-        if (!CompoundFood.isHandHoldFood(itemStack))
+        // only allow non-compound food as ingredient
+        if (!CompoundFood.isHandHoldFood(itemStack, true))
             return false
 
         // 1. last cover
