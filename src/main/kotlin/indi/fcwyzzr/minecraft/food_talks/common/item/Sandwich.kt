@@ -13,6 +13,7 @@ import indi.fcwyzzr.minecraft.food_talks.toResourceLocation
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.network.chat.Component
 import net.minecraft.tags.TagKey
 import net.minecraft.util.Mth
 import net.minecraft.world.effect.MobEffect
@@ -24,6 +25,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.alchemy.PotionContents
+import net.minecraft.world.item.component.ItemLore
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions
 import org.spongepowered.include.com.google.common.collect.Iterables
 import java.util.*
@@ -41,7 +43,7 @@ object Sandwich: CompoundFood(
     fun layers(itemStack: ItemStack): List<Holder<Item>>{
         if (!itemStack.`is`(this))
             throw IllegalArgumentException("itemStack other than sandwich should not use this method")
-        return itemStack.components[SimpleDataComponents.SandwichLayer]!!
+        return itemStack.components[SimpleDataComponents.SandwichLayer] ?: listOf()
     }
 
     override fun uponBite(itemStack: ItemStack, entity: LivingEntity): Boolean {
