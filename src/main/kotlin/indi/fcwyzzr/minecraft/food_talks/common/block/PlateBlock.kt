@@ -10,7 +10,6 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
-import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerLevel
@@ -22,7 +21,6 @@ import net.minecraft.world.ItemInteractionResult
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
@@ -99,13 +97,11 @@ class PlateBlock private constructor(): Block(Properties.of().apply {
     ): InteractionResult {
         val entity = level.getBlockEntity(pos) as PlateBlockEntity
         if (player.isShiftKeyDown){
-            if (player.hasInfiniteMaterials())
-                entity.clear()
-            else if (level is ServerLevel)
-                getDrops(state, level, pos, level.getBlockEntity(pos)).forEach{
-                    popResource(level, pos, it)
-                }
+            if (!player.hasInfiniteMaterials()
+                && level is ServerLevel)
+                entity.forEachFoldedContent { popResource(level, pos, this) }
 
+            entity.clear()
 
             return InteractionResult.SUCCESS
         }
@@ -166,32 +162,9 @@ class PlateBlock private constructor(): Block(Properties.of().apply {
             add(Plate.defaultInstance)
 
         val entity = params.getParameter(LootContextParams.BLOCK_ENTITY) as PlateBlockEntity
-        entity
-            .popDisplay()
-            ?.apply(::add)
-            ?: run {
-                entity
-                    .readOnlyIngredient
-                    .fold(mutableMapOf<Item, MutableMap<DataComponentMap, ItemStack>>()) { map, itemStack ->
-                        if (itemStack.item !in map) {
-                            map[itemStack.item] = mutableMapOf(itemStack.components to itemStack)
-                            return@fold map
-                        }
-
-                        val itemSet = map[itemStack.item]!!
-                        if (itemStack.components !in itemSet) {
-                            itemSet[itemStack.components] = itemStack
-                            return@fold map
-                        }
-
-                        itemSet[itemStack.components]!!.grow(itemStack.count)
-
-                        map
-                    }
-                    .flatMap { it.value.values }
-                    .forEach(::add)
-            }
+        entity.forEachFoldedContent(::add)
     }
+
 
 
     companion object: FRegistry<Block>  {
