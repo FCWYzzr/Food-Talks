@@ -129,10 +129,10 @@ object Cocktail: CompoundFood(
         }
     }
 
-    private fun mergeCollapsedMobEffectInstance(self: MobEffectInstance): MobEffectInstance{
+    private fun mergeFoldedMobEffectInstance(self: MobEffectInstance): MobEffectInstance{
         val hidden = (self as MobEffectInstanceAccessor).hiddenEffect ?: return self
 
-        val mergedHidden = mergeCollapsedMobEffectInstance(MobEffectInstance(hidden))
+        val mergedHidden = mergeFoldedMobEffectInstance(MobEffectInstance(hidden))
 
         return mergeMobEffectInstance(mergedHidden, self)
     }
@@ -151,7 +151,7 @@ object Cocktail: CompoundFood(
         val changesKey = removalWhenMergeMobEffectMap(addonMap, baseMap)
         val hiddenMergedRemoval = changesKey
             .mapNotNull(baseMap::get)
-            .map(::mergeCollapsedMobEffectInstance)
+            .map(::mergeFoldedMobEffectInstance)
             .associateBy { it.effect }
 
         changesKey
