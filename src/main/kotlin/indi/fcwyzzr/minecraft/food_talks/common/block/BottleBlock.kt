@@ -12,6 +12,7 @@ import net.minecraft.core.Registry
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceKey
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.ItemInteractionResult
@@ -20,7 +21,10 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ItemUtils
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.alchemy.PotionContents
-import net.minecraft.world.level.*
+import net.minecraft.world.level.BlockGetter
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.LevelReader
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.EntityBlock
@@ -28,8 +32,9 @@ import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.IntegerProperty
-import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.level.material.PushReaction
+import net.minecraft.world.level.storage.loot.LootParams
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
@@ -81,23 +86,6 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
         return canSupportCenter(pLevel, pPos.below(), Direction.UP)
     }
 
-    override fun onDestroyedByPlayer(
-        state: BlockState,
-        level: Level,
-        pos: BlockPos,
-        player: Player,
-        willHarvest: Boolean,
-        fluid: FluidState
-    ): Boolean {
-        val entity = level.getBlockEntity(pos) as BottleBlockEntity
-
-        if (level.gameRules.getBoolean(GameRules.RULE_DOBLOCKDROPS) && ! player.hasInfiniteMaterials())
-            doDestroyDrop(level, entity, state.getValue(PROPERTY_FILL_LEVEL))
-        super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid)
-
-        return true
-    }
-
     override fun updateShape(
         state: BlockState,
         direction: Direction,
@@ -111,7 +99,8 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
                 level,
                 pos
             )
-        ) Blocks.AIR.defaultBlockState() else
+        ) Blocks.AIR.defaultBlockState()
+        else
             super.updateShape(
             state,
             direction,
@@ -122,9 +111,10 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
         )
     }
 
-    private fun doDestroyDrop(level: Level, entity: BottleBlockEntity, fillLevel: Int){
-        val itemStack = Cocktail.buildFromBottle(entity, fillLevel)
-        popResource(level, entity.blockPos, itemStack)
+    override fun getDrops(state: BlockState, params: LootParams.Builder): MutableList<ItemStack> {
+        val entity = params.getParameter(LootContextParams.BLOCK_ENTITY) as BottleBlockEntity
+        val fillLevel = state.getValue(PROPERTY_FILL_LEVEL)
+        return mutableListOf(Cocktail.buildFromBottle(entity, fillLevel))
     }
 
     /**
@@ -140,14 +130,13 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
         if (! player.isShiftKeyDown)
             return InteractionResult.PASS
 
-        doDestroyDrop(
-            level,
-            level.getBlockEntity(pos) as BottleBlockEntity,
-            state.getValue(PROPERTY_FILL_LEVEL)
-        )
 
-        if (!player.hasInfiniteMaterials())
-            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState())
+        if (player.hasInfiniteMaterials() && level is ServerLevel)
+            getDrops(state, level, pos, level.getBlockEntity(pos)).forEach {
+                popResource(level, pos, it)
+            }
+        else if (level is ServerLevel)
+            level.destroyBlock(pos, true)
 
         return InteractionResult.SUCCESS
     }

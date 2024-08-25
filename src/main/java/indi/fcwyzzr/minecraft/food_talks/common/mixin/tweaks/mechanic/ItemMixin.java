@@ -21,7 +21,7 @@ public class ItemMixin {
         if (!cir.getReturnValue().getResult().equals(InteractionResult.CONSUME))
             return;
         final var item = player.getItemInHand(usedHand);
-        if (! CompoundFood.Companion.isFood(item))
+        if (! CompoundFood.Companion.isFood(item, false))
             return;
         
         if (!Anorexia.INSTANCE.canEat(item, player))

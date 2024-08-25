@@ -53,6 +53,9 @@ object SandwichRenderer {
         light: Int,
         overlay: Int
     ){
+        if (layer.isEmpty())
+            return
+
         val itemRenderer = Minecraft
             .getInstance()
             .itemRenderer

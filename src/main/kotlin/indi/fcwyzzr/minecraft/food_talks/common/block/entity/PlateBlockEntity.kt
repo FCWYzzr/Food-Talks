@@ -11,7 +11,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.Registry
-import net.minecraft.core.component.DataComponents
+import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
@@ -20,6 +20,7 @@ import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
 import net.minecraft.resources.ResourceKey
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
@@ -50,6 +51,32 @@ class PlateBlockEntity(
         setChanged()
     }
 
+    fun forEachFoldedContent(action: ItemStack.() -> Unit){
+        displayItem
+            ?.apply(action)
+            ?: run {
+                readOnlyIngredient
+                    .fold(mutableMapOf<Item, MutableMap<DataComponentMap, ItemStack>>()) { map, itemStack ->
+                        if (itemStack.item !in map) {
+                            map[itemStack.item] = mutableMapOf(itemStack.components to itemStack)
+                            return@fold map
+                        }
+
+                        val itemSet = map[itemStack.item]!!
+                        if (itemStack.components !in itemSet) {
+                            itemSet[itemStack.components] = itemStack
+                            return@fold map
+                        }
+
+                        itemSet[itemStack.components]!!.grow(itemStack.count)
+
+                        map
+                    }
+                    .flatMap { it.value.values }
+                    .forEach(action)
+            }
+    }
+
     private fun addCover(itemStack: ItemStack): Boolean{
         if (!itemStack.`is`(sandwichCover))
             return false
@@ -65,7 +92,8 @@ class PlateBlockEntity(
         if (size == MAX_LAYER)
             return false
 
-        if (!CompoundFood.isHandHoldFood(itemStack))
+        // only allow non-compound food as ingredient
+        if (!CompoundFood.isHandHoldFood(itemStack, true))
             return false
 
         // 1. last cover
@@ -93,13 +121,6 @@ class PlateBlockEntity(
         display = itemStack
         setChanged()
         return true
-    }
-
-    fun popDisplay(): ItemStack? {
-        val pop = display
-        display = null
-        setChanged()
-        return pop
     }
 
 

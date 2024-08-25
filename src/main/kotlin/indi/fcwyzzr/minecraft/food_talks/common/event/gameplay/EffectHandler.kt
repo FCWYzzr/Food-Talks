@@ -4,13 +4,16 @@ import com.google.common.math.IntMath.pow
 import indi.fcwyzzr.minecraft.food_talks.FoodTalks
 import indi.fcwyzzr.minecraft.food_talks.api.common.item.CompoundFood
 import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.beneficial.*
-import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful.*
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful.Anorexia
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful.Toothache
+import indi.fcwyzzr.minecraft.food_talks.common.mob_effect.harmful.Vomit
 import indi.fcwyzzr.minecraft.food_talks.common.registries.ToothacheDamage
 import indi.fcwyzzr.minecraft.food_talks.common.registries.from
 import indi.fcwyzzr.minecraft.food_talks.common.registries.milkIrremovable
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
+import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
@@ -65,11 +68,9 @@ object EffectHandler {
 
     @SubscribeEvent
     fun entityEatingWhenToothache(event: Tick){
-        if (event.duration < 20)
+        if (!event.entity.hasEffect(Toothache.holder))
             return
         if (event.duration % 10 != 0)
-            return
-        if (!event.entity.hasEffect(Toothache.holder))
             return
         if (!CompoundFood.isFood(event.item))
             return
@@ -252,6 +253,7 @@ object EffectHandler {
         event.isCanceled = true
         event.entity.health = event.entity.maxHealth
         event.entity.removeEffect(JackHead.holder)
+        event.entity.addEffect(MobEffectInstance(MobEffects.DARKNESS, 20))
         if (event.entity.level().isClientSide)
             return
         val serverLevel = event.entity.level() as ServerLevel

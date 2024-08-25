@@ -33,8 +33,6 @@ abstract class CompoundFood(
     fun chewTick(stack: ItemStack) = (stack.components[FoodItemProperties.type]!!.chewSeconds * FoodTalks.TPS).toInt()
     fun bites(stack: ItemStack) = stack.maxDamage
     override fun getUseAnimation(stack: ItemStack) = UseAnim.EAT
-//    override fun getUseDuration(stack: ItemStack, entity: LivingEntity) =
-//        (stack.components[FoodItemProperties.type]!!.chewSeconds * FoodTalks.TPS).toInt()
 
     override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 5 + chewTick(stack)
     override fun use(level: Level, player: Player, usedHand: InteractionHand): InteractionResultHolder<ItemStack> {
@@ -65,8 +63,15 @@ abstract class CompoundFood(
     }
 
     companion object{
-        fun isFood(itemStack: ItemStack): Boolean{
-            return itemStack.components.has(DataComponents.FOOD) || itemStack.item is CompoundFood
+        fun isFood(itemStack: ItemStack, notCompound: Boolean = false): Boolean{
+            return if (notCompound)
+                isVanillaFood(itemStack) && itemStack.item !is CompoundFood
+            else
+                isVanillaFood(itemStack) || itemStack.item is CompoundFood
+        }
+
+        private fun isVanillaFood(itemStack: ItemStack): Boolean{
+            return itemStack.components.has(DataComponents.FOOD)
         }
 
         fun containerOrNull(itemStack: ItemStack): ItemStack? {
@@ -82,8 +87,8 @@ abstract class CompoundFood(
                 }?.getOrNull()
         }
 
-        fun isHandHoldFood(itemStack: ItemStack): Boolean{
-            return isFood(itemStack) && containerOrNull(itemStack) == null
+        fun isHandHoldFood(itemStack: ItemStack, notCompound: Boolean = false): Boolean{
+            return isFood(itemStack, notCompound) && containerOrNull(itemStack) == null
         }
     }
 }

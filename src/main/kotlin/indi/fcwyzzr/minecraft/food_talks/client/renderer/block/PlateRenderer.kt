@@ -44,7 +44,7 @@ object PlateRenderer: BlockEntityRenderer<PlateBlockEntity> {
                 )
             else{
                 poseStack.pushPose()
-                poseStack.translate(0.5, 2.5 / 16, 0.5)
+                poseStack.translate(0.5, 2.0 / 16, 0.5)
                 poseStack.mulPose(Axis.XP.rotationDegrees(90F))
                 poseStack.scale(1F, 1F, 3F)
                 Minecraft.getInstance().itemRenderer.renderStatic(

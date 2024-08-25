@@ -18,5 +18,8 @@
   "effect.food_talks.gout": "痛风",
   "effect.food_talks.vomit": "呕吐",
   "effect.food_talks.toothache": "牙痛",
-  "effect.food_talks.overweight": "肥胖"
+  "effect.food_talks.overweight": "肥胖",
+
+  "death.attack.tooth_ache": "%1$s可能需要一副假牙。",
+  "death.attack.gout": "%1$s的关节爆炸了。"
 }
