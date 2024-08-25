@@ -19,6 +19,8 @@
   "effect.food_talks.gout": "Gout",
   "effect.food_talks.vomit": "Vomit",
   "effect.food_talks.toothache": "Toothache",
-  "effect.food_talks.overweight": "Overweight"
+  "effect.food_talks.overweight": "Overweight",
 
+  "death.attack.toothache": "%1$s 's teeth was shattered into pieces.",
+  "death.attack.gout": "%1$s 's joint exploded."
 }
