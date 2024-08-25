@@ -33,8 +33,6 @@ abstract class CompoundFood(
     fun chewTick(stack: ItemStack) = (stack.components[FoodItemProperties.type]!!.chewSeconds * FoodTalks.TPS).toInt()
     fun bites(stack: ItemStack) = stack.maxDamage
     override fun getUseAnimation(stack: ItemStack) = UseAnim.EAT
-//    override fun getUseDuration(stack: ItemStack, entity: LivingEntity) =
-//        (stack.components[FoodItemProperties.type]!!.chewSeconds * FoodTalks.TPS).toInt()
 
     override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 5 + chewTick(stack)
     override fun use(level: Level, player: Player, usedHand: InteractionHand): InteractionResultHolder<ItemStack> {
