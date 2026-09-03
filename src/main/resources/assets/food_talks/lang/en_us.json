@@ -1,19 +1,18 @@
 {
   "block.food_talks.bottle_block": "Glass Bottle",
-  "block.food_talks.plate_block": "Wooden Plate",
+  "block.food_talks.plate": "Wooden Plate",
   "item.food_talks.cocktail": "Cocktail",
-  "item.food_talks.Plate": "Wooden Plate",
   "item.food_talks.sandwich": "Sandwich",
 
   "effect.food_talks.poison_resistance": "Poison Resistance",
   "effect.food_talks.darkness_infused": "Darkness Infused",
-  "effect.food_talks.goddess_grace": "Goddess Grace",
-  "effect.food_talks.game_grace": "Game Grace",
+  "effect.food_talks.treasure": "Treasure",
+  "effect.food_talks.endless_treasure": "Endless Treasure",
   "effect.food_talks.smelly": "Smelly",
   "effect.food_talks.happy": "Happiness",
   "effect.food_talks.projectile_immune": "Projectile Immunity",
   "effect.food_talks.starving": "Starving",
-  "effect.food_talks.jack_head": "Head' o Jack",
+  "effect.food_talks.scapegoat": "Scapegoat",
 
   "effect.food_talks.anorexia": "Anorexia",
   "effect.food_talks.gout": "Gout",
@@ -22,5 +21,7 @@
   "effect.food_talks.overweight": "Overweight",
 
   "death.attack.toothache": "%1$s 's teeth was shattered into pieces.",
-  "death.attack.gout": "%1$s 's joint exploded."
+  "death.attack.gout": "%1$s 's joint exploded.",
+
+  "itemGroup.food_talks.ft_tab": "Food Talks"
 }
