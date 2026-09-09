@@ -20,8 +20,11 @@
   "effect.food_talks.toothache": "Toothache",
   "effect.food_talks.overweight": "Overweight",
 
-  "death.attack.toothache": "%1$s 's teeth was shattered into pieces.",
-  "death.attack.gout": "%1$s 's joint exploded.",
+  "lore.food_talks.nut_sat_bites": "nut: %s\nsat: %s%%\nbites: %s\ntotal-nut: %s\ntotal-sat: %s",
 
-  "itemGroup.food_talks.ft_tab": "Food Talks"
+  "itemGroup.food_talks.ft_tab": "Food Talks",
+
+  "death.attack.toothache": "%1$s 's teeth was shattered into pieces.",
+  "death.attack.gout": "%1$s 's joint exploded."
+
 }

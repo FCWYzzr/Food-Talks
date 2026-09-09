@@ -22,26 +22,15 @@ object Bewlr: BlockEntityWithoutLevelRenderer(
         packedOverlay: Int
     ) {
         when(stack.item){
-            Sandwich -> renderSandwich(stack, poseStack, buffer, packedLight, packedOverlay)
+            Sandwich -> SandwichRenderer.renderSandwich(
+                Sandwich.layers(stack),
+                poseStack,
+                buffer,
+                packedLight,
+                packedOverlay,
+                true
+            )
             else -> super.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
         }
-    }
-
-    private fun renderSandwich(
-        stack: ItemStack,
-        poseStack: PoseStack,
-        buffer: MultiBufferSource,
-        packedLight: Int,
-        packedOverlay: Int
-    ){
-        val layers = Sandwich.layers(stack)
-
-        SandwichRenderer.renderLayersWithCenter(
-            layers,
-            poseStack,
-            buffer,
-            packedLight,
-            packedOverlay
-        )
     }
 }

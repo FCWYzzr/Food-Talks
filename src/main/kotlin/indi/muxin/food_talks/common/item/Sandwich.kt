@@ -1,18 +1,21 @@
 package indi.muxin.food_talks.common.item
 
 import indi.muxin.food_talks.FoodTalks
-import indi.muxin.food_talks.client.renderer.Bewlr
-import indi.muxin.food_talks.common.block.entity.PlateBlockEntity
+import indi.muxin.food_talks.common.block.PlateBlockEntity
 import indi.muxin.food_talks.common.data_components.FoodStackProperties
 import indi.muxin.food_talks.common.data_components.FoodStackPropertiesDCType
 import indi.muxin.food_talks.common.data_components.PossibleEffectListDCType
 import indi.muxin.food_talks.common.data_components.SandwichLayerDCType
 import indi.muxin.food_talks.common.mixin.mechanic.MobEffectInstanceAccessor
-import indi.muxin.food_talks.common.registries.foodItemRewardRegistry
-import indi.muxin.food_talks.common.registries.foodTagPunishmentRegistry
+import indi.muxin.food_talks.common.registries.FoodItemReward
+import indi.muxin.food_talks.common.registries.FoodTagPunishment
+import indi.muxin.food_talks.toResourceLocation
+import indi.muxin.neoforged.utils.buildComponent
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.util.Mth
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
@@ -22,12 +25,14 @@ import net.minecraft.world.food.FoodProperties.PossibleEffect
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.alchemy.PotionContents
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions
+import net.minecraft.world.item.component.ItemLore
 import org.spongepowered.include.com.google.common.collect.Iterables
 import java.util.*
-import java.util.function.Consumer
 import kotlin.jvm.optionals.getOrNull
+import kotlin.math.ceil
+import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.round
 
 object Sandwich: CompoundFood(
     0.5F,
@@ -94,36 +99,17 @@ object Sandwich: CompoundFood(
             .fold(IngredientFolder(), IngredientFolder::fold)
             .unpack()
 
-        // food reward
         entity
             .ingredients
             .asSequence()
             .drop(1)
-            .map { mutableMapOf(it.item to 1)  }
-            .reduce {m1, m2 ->
-                val intersect = m1.keys intersect m2.keys
-
-                intersect.forEach{k ->
-                    m1[k] = m1[k]!! + m2[k]!!
-                }
-
-                m2.filterNot {(k, _) ->
-                    k in intersect
-                }.forEach(m1::put)
-
-                m1
-            }
-            .map { (item, count) ->
-                BuiltInRegistries.ITEM.getResourceKey(item) to count
-            }
-            .mapNotNull { (key, count) ->
-                key.getOrNull() ?.location() ?.to(count)
-            }
-            .mapNotNull { (location, count) ->
-                val reward = foodItemRewardRegistry[location]
-                    ?: return@mapNotNull null
-
-                reward(count)to 1F
+            .map { mapOf(it.itemHolder to 1)  }
+            .reduce {m1, m2 -> buildMap {(m1.keys union m2.keys).forEach {
+                put(it, (m1[it] ?: 0) + (m2[it] ?: 0))
+            }}}
+            .mapNotNull { (holder, count) ->
+                val reward = holder.getData(FoodItemReward.type) ?: return@mapNotNull null
+                reward.calculate(count) to 1F
             }
             .fold(effectFolder, EffectFolder::fold)
 
@@ -132,9 +118,11 @@ object Sandwich: CompoundFood(
             .drop(1)
             .dropLast(1)
             .asSequence()
-            .flatMap { it.tags.toList() }
-            .filter { it.location.namespace == FoodTalks.MOD_ID }
-            .filter { it.location.path.startsWith("food_category") }
+            .mapNotNull {
+                it.tags.filter {i ->
+                    i.location.namespace == FoodTalks.MOD_ID && i.location.path.startsWith("food_category")
+                }.findAny().getOrNull()
+            }
             .groupingBy { it }
             .fold(0){i, _ -> i + 1}
             .toMap()
@@ -143,12 +131,15 @@ object Sandwich: CompoundFood(
 //        val tagPunishmentThreshold2 = entity.ingredients.size * 3 / 4    // 100%, 5
 
         val (possibleEffects, mustEffects) = tagCounter
-            .filter { (_, v) -> v >= tagPunishmentThreshold1 }
+            .filter { (_, v) -> v >= max(tagPunishmentThreshold1, 2) }
             .mapNotNull { (tag, v) ->
-                val punishment = foodTagPunishmentRegistry[tag.location] ?: return@mapNotNull null
+                val punishment = BuiltInRegistries.ITEM.getTag(tag).get()
+                    .first()
+                    .getData(FoodTagPunishment.type) ?: return@mapNotNull null
+
                 val prob = (v - tagPunishmentThreshold1) * 2.0F / entity.ingredients.size  + 0.5F
                 val level = (v - tagPunishmentThreshold1) * 20.0F / entity.ingredients.size
-                punishment(level) to prob
+                punishment.calculate(ceil(level).toInt()) to prob
             }.fold(effectFolder, EffectFolder::fold)
             .pack(bites)
 
@@ -156,7 +147,7 @@ object Sandwich: CompoundFood(
         // final assembly
 
         val nutPerBite = Mth.ceil(nutrition.toFloat() * 3 / bites)
-        val satPerBite = saturation / entity.size
+        val satPerBite = saturation / entity.ingredients.size
 
         set(FoodStackPropertiesDCType, FoodStackProperties(nutPerBite, satPerBite))
         set(PossibleEffectListDCType, possibleEffects.map {
@@ -169,13 +160,26 @@ object Sandwich: CompoundFood(
             mustEffects
         ))
         set(DataComponents.MAX_DAMAGE, bites)
+        set(DataComponents.LORE, itemLoreFromDetail(
+            nutPerBite, satPerBite, bites,
+            possibleEffects, mustEffects, entity.ingredients))
     }
 
-    @Suppress("removal")
-    @Deprecated("???")
-    override fun initializeClient(consumer: Consumer<IClientItemExtensions>) {
-        consumer.accept(object :IClientItemExtensions{
-            override fun getCustomRenderer() = Bewlr
+    private fun itemLoreFromDetail(
+        nutPerBite: Int, satPerBite: Float, bites: Int,
+        possibleEffects: Map<MobEffectInstance, Float>,
+        mustEffects: List<MobEffectInstance>, ingredients: List<ItemStack>): ItemLore {
+        return ItemLore(buildList<Component> {
+            add(buildComponent(TranslatableContents(
+                "nut_sat_bites".toResourceLocation().toLanguageKey("lore"), null,
+                arrayOf("$nutPerBite", "%.2f".format(satPerBite * 100), "$bites",
+                    "${nutPerBite * bites}", "${round(nutPerBite * bites * satPerBite)}")
+            )))
+            addAll(mustEffects.describeEffects())
+            addAll(possibleEffects.describeEffects())
+            ingredients.forEach {
+                add(it.displayName)
+            }
         })
     }
 
@@ -268,7 +272,7 @@ object Sandwich: CompoundFood(
             val item = itemStack.item
             val food = itemStack.components[DataComponents.FOOD]!!
 
-            bites += min(6, food.nutrition)
+            bites += min(4, food.nutrition)
 
             val potionEffects = itemStack.components[DataComponents.POTION_CONTENTS]
                 ?.allEffects

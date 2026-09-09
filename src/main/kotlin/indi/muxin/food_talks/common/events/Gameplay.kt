@@ -1,4 +1,4 @@
-package indi.muxin.food_talks.common.world_reaction.event.gameplay
+package indi.muxin.food_talks.common.events
 
 import com.google.common.math.IntMath.pow
 import indi.muxin.food_talks.FoodTalks
@@ -47,7 +47,32 @@ import kotlin.math.min
     modid = FoodTalks.MOD_ID,
     value = [Dist.CLIENT, Dist.DEDICATED_SERVER]
 )
-object EffectHandler {
+object Gameplay {
+    @SubscribeEvent
+    fun tickEating(tick: Tick){
+        val itemStack = tick.item
+        val item = itemStack.item
+        if (item !is CompoundFood)
+            return
+
+
+        val chewTick = item.chewTick(itemStack)
+        if (tick.duration != 1)
+            return
+
+
+        val entity = tick.entity
+        if (itemStack.damageValue < itemStack.maxDamage
+            && item.uponBite(itemStack, entity)
+            && Anorexia.canEat(itemStack, entity))
+            tick.duration += chewTick
+        else
+            tick.isCanceled = true
+
+
+        itemStack.damageValue += 1
+    }
+
     @SubscribeEvent
     fun entityTryToRemoveEffect(event: Remove){
         if (event.cure != null)

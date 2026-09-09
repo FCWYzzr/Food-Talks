@@ -1,11 +1,13 @@
 package indi.muxin.food_talks.common.item
 
-import indi.muxin.neoforged.utils.buildComponent
 import indi.muxin.food_talks.FoodTalks
-import indi.muxin.food_talks.common.block.entity.BottleBlockEntity
+import indi.muxin.food_talks.common.block.BottleBlockEntity
 import indi.muxin.food_talks.common.mixin.mechanic.MobEffectInstanceAccessor
+import indi.muxin.neoforged.utils.buildComponent
+import indi.muxin.neoforged.utils.buildMutableComponent
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
+import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.contents.PlainTextContents.LiteralContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.world.effect.MobEffect
@@ -19,6 +21,60 @@ import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.item.component.ItemLore
 import java.time.Duration
 import java.util.*
+
+fun MobEffectInstance.describe(): MutableComponent {
+    val time = Duration.ofSeconds(duration / FoodTalks.TPS.toLong())
+    val key = effect.key!!
+    return buildMutableComponent(
+        TranslatableContents(
+            key.location().toLanguageKey("effect"), null, arrayOf()
+        )
+    ) {
+        style.withColor(0x87CEEB)
+        style.withBold(true)
+
+
+        append(
+            buildComponent(
+                LiteralContents(
+                    " §3<%d>§r".format(amplifier + 1)
+                )
+            )
+        )
+        append(
+            buildComponent(
+                LiteralContents(
+                    when {
+                        time.toHours() > 0 -> " §9[%02d:%02d:%02d]§r".format(
+                            time.toHours(),
+                            time.toMinutesPart(),
+                            time.toSecondsPart()
+                        )
+
+                        time.toMinutes() > 0 -> " §9[%02d:%02d]§r".format(
+                            time.toMinutes(),
+                            time.toSecondsPart()
+                        )
+
+                        else -> " §9%02ds§r".format(
+                            time.toSeconds()
+                        )
+                    }
+                )
+            )
+        )
+    }
+}
+fun List<MobEffectInstance>.describeEffects() = map {it.describe()}.toList()
+
+fun Map<MobEffectInstance, Float>.describeEffects() = map {(it, possible) ->
+    it.describe().apply {
+        append(buildComponent(LiteralContents(
+            " §5%.2f%%§r".format(
+                possible * 100
+            ))))
+    }
+}.toList()
 
 object Cocktail: CompoundFood(
     0.25F,
@@ -61,7 +117,7 @@ object Cocktail: CompoundFood(
         val timeMultiplier = entity.extend
         val harmFilter = entity.detoxified
 
-        val potionContents = entity.dumpContents()
+        val potionContents = entity.contents.values
             .filter {
                 !harmFilter || it.effect.value().category != MobEffectCategory.HARMFUL
             }
@@ -69,38 +125,23 @@ object Cocktail: CompoundFood(
                 if (timeMultiplier == 0 && amplifierAddon == 0)
                     it
                 else {
-                val time = it.duration * (timeMultiplier + 1) / 16
-                    val amplifier = it.amplifier + 1 + amplifierAddon
+                    val time = it.duration * (timeMultiplier + 1) / 16
+                    val amplifier = it.amplifier + amplifierAddon
                     MobEffectInstance(it.effect, time, amplifier)
                 }
             }
             .toList()
 
-        DataComponents.ITEM_NAME
-
         return  buildItemStack {
-            set(
-                DataComponents.MAX_DAMAGE,
-                fillLevel * 8
-            )
-            set(
-                DataComponents.POTION_CONTENTS,
-                PotionContents(
+            set(DataComponents.MAX_DAMAGE, fillLevel * 8)
+            set(DataComponents.POTION_CONTENTS, PotionContents(
                     Optional.empty(),
                     Optional.empty(),
-                    potionContents
-                )
-            )
+                    potionContents))
 
-            set(
-                DataComponents.DAMAGE,
-                0
-            )
+            set(DataComponents.DAMAGE, 0)
 
-            set(
-                DataComponents.LORE,
-                itemLoreFromMobEffectInstances(potionContents)
-            )
+            set(DataComponents.LORE, itemLoreFromMobEffectInstances(potionContents))
         }
     }
 
@@ -165,29 +206,6 @@ object Cocktail: CompoundFood(
     }
 
     private fun itemLoreFromMobEffectInstances(effects: List<MobEffectInstance>): ItemLore {
-
-        val lore = effects.map {
-            val time = Duration.ofSeconds(it.duration / FoodTalks.TPS.toLong())
-            val key = it.effect.key!!
-            buildComponent(TranslatableContents(
-                key.location().toLanguageKey("effect"), null, arrayOf()
-            )){
-                style.withColor(0x87CEEB)
-                style.withBold(true)
-
-
-                append(buildComponent(LiteralContents(
-                    " §3<%d>§r".format(it.amplifier+1)
-                )))
-                append(buildComponent(LiteralContents(
-                    " §9[%02d:%02d:%02d]§r".format(
-                        time.toHours(),
-                        time.toMinutesPart(),
-                        time.toSecondsPart()
-                    ))))
-            }
-        }.toList()
-
-        return ItemLore(lore)
+        return ItemLore(effects.describeEffects())
     }
 }

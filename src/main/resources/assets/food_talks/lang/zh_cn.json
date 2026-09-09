@@ -19,6 +19,9 @@
   "effect.food_talks.toothache": "牙痛",
   "effect.food_talks.overweight": "肥胖",
 
+  "lore.food_talks.nut_sat_bites": "饱食度: %s\n饱和率: %s%%\n可以咬%s口\n总饱食度:%s\n总饱和度:%s",
+
+
   "death.attack.tooth_ache": "%1$s需要一副假牙。",
   "death.attack.gout": "%1$s的关节爆炸了。",
 

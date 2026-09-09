@@ -5,27 +5,18 @@ import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.neoforged.neoforge.registries.RegisterEvent
-import net.neoforged.neoforge.registries.RegisterEvent.RegisterHelper
 
 interface FRegistry<registryT> {
-
     val location: ResourceLocation
-
-    val holder: Holder<registryT>
-
     val registryKey: ResourceKey<out Registry<registryT>>
+    val holder: Holder<registryT>
+    @Suppress("UNCHECKED_CAST")
+    val instance: registryT get() = this as registryT
 
-    fun registerByHelper(helper: RegisterHelper<registryT>){
-        @Suppress("UNCHECKED_CAST")
-        helper.register(this.location, (this as registryT)!!)
+    infix fun registerTo(ev: RegisterEvent){
+        @Suppress("TYPE_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+        ev.register(registryKey) {
+            it.register(location, instance)
+        }
     }
 }
-
-infix fun <BuiltinT> RegisterEvent.doRegister(
-    instance: FRegistry<BuiltinT>
-){
-    register(instance.registryKey){ helper ->
-        instance.registerByHelper(helper)
-    }
-}
-

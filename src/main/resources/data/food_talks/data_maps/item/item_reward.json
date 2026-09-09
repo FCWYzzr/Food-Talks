@@ -1,0 +1,207 @@
+{
+  "values": {
+    "minecraft:honey_bottle": {
+      "effect": "food_talks:poison_resistance",
+      "durationBase": 200,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 1
+    },
+    "minecraft:ominous_bottle": {
+      "effect": "food_talks:darkness_infused",
+      "durationBase": 200,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 1
+    },
+    "minecraft:golden_carrot": {
+      "effect": "minecraft:night_vision",
+      "durationBase": 200,
+      "durationUnit": 200,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:golden_apple": {
+      "effect": "food_talks:treasure",
+      "durationBase": 200,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 1
+    },
+    "minecraft:enchanted_golden_apple": {
+      "effect": "food_talks:endless_treasure",
+      "durationBase": 200,
+      "durationUnit": 50,
+      "amplifierBase": 0,
+      "amplifierUnit": 1
+    },
+    "minecraft:beef": {
+      "effect": "minecraft:strength",
+      "durationBase": 200,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 1
+    },
+    "minecraft:cooked_beef": {
+      "effect": "minecraft:strength",
+      "durationBase": 200,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 1
+    },
+    "minecraft:salmon": {
+      "effect": "minecraft:dolphins_grace",
+      "durationBase": 100,
+      "durationUnit": 200,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:cooked_salmon": {
+      "effect": "minecraft:dolphins_grace",
+      "durationBase": 200,
+      "durationUnit": 300,
+      "amplifierBase": 1,
+      "amplifierUnit": 0
+    },
+    "minecraft:cod": {
+      "effect": "minecraft:water_breathing",
+      "durationBase": 100,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:cooked_cod": {
+      "effect": "minecraft:water_breathing",
+      "durationBase": 400,
+      "durationUnit": 200,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:porkchop": {
+      "effect": "minecraft:absorption",
+      "durationBase": 300,
+      "durationUnit": 50,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:cooked_porkchop": {
+      "effect": "minecraft:absorption",
+      "durationBase": 600,
+      "durationUnit": 100,
+      "amplifierBase": 3,
+      "amplifierUnit": 0
+    },
+    "minecraft:chicken": {
+      "effect": "minecraft:slow_falling",
+      "durationBase": 100,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:cooked_chicken": {
+      "effect": "minecraft:slow_falling",
+      "durationBase": 100,
+      "durationUnit": 150,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:mutton": {
+      "effect": "food_talks:smelly",
+      "durationBase": 50,
+      "durationUnit": 50,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:cooked_mutton": {
+      "effect": "food_talks:smelly",
+      "durationBase": 100,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:rabbit": {
+      "effect": "minecraft:jump_boost",
+      "durationBase": 100,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 1
+    },
+    "minecraft:cooked_rabbit": {
+      "effect": "minecraft:jump_boost",
+      "durationBase": 200,
+      "durationUnit": 300,
+      "amplifierBase": 1,
+      "amplifierUnit": 1
+    },
+    "minecraft:apple": {
+      "effect": "food_talks:happy",
+      "durationBase": 100,
+      "durationUnit": 150,
+      "amplifierBase": 0,
+      "amplifierUnit": 1
+    },
+    "minecraft:chorus_fruit": {
+      "effect": "food_talks:projectile_immune",
+      "durationBase": 200,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:sweet_berries": {
+      "effect": "minecraft:speed",
+      "durationBase": 200,
+      "durationUnit": 200,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:melon_slice": {
+      "effect": "minecraft:instant_health",
+      "durationBase": 1,
+      "durationUnit": 0,
+      "amplifierBase": 0,
+      "amplifierUnit": 1
+    },
+    "minecraft:cookie": {
+      "effect": "food_talks:happy",
+      "durationBase": 20,
+      "durationUnit": 10,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:bread": {
+      "effect": "minecraft:saturation",
+      "durationBase": 0,
+      "durationUnit": 2,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:baked_potato": {
+      "effect": "minecraft:fire_resistance",
+      "durationBase": 100,
+      "durationUnit": 50,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:pumpkin_pie": {
+      "effect": "food_talks:scape_goat",
+      "durationBase": 50,
+      "durationUnit": 50,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:carrot": {
+      "effect": "minecraft:night_vision",
+      "durationBase": 20,
+      "durationUnit": 10,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "minecraft:dried_kelp": {
+      "effect": "food_talks:starving",
+      "durationBase": 600,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    }
+  }
+}

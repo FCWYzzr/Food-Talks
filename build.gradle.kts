@@ -185,7 +185,8 @@ tasks.withType<ProcessResources>().configureEach {
     )
     inputs.properties(replaceProperties)
 
-    filesMatching("META-INF/neoforge.mods.toml") {
+    filesMatching("META-INF/neoforge.mods.toml.template") {
+        name = name.removeSuffix(".template")
         expand(replaceProperties)
     }
 }

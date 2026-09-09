@@ -1,6 +1,6 @@
 package indi.muxin.food_talks.common.mixin.item
 
-import indi.muxin.food_talks.common.block.BottleBlock.Companion.instance
+import indi.muxin.food_talks.common.block.BottleBlock
 import net.minecraft.advancements.CriteriaTriggers
 import net.minecraft.core.BlockPos
 import net.minecraft.core.component.DataComponents
@@ -43,7 +43,7 @@ class BottleBlockItem(pProperties: Properties) : Item(pProperties) {
     fun placeMixin(context: BlockPlaceContext): InteractionResult {
         if (!context.canPlace()) return InteractionResult.FAIL
 
-        val blockState = instance.defaultBlockState()
+        val blockState = BottleBlock.defaultBlockState()
         if (!this.placeBlockMixin(context, blockState)) return InteractionResult.FAIL
 
         val blockPos = context.clickedPos

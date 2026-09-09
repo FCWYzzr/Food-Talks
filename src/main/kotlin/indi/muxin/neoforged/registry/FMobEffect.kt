@@ -15,12 +15,8 @@ abstract class FMobEffect(
     cate: MobEffectCategory,
     color: Int
 ): MobEffect(cate, color), FRegistry<MobEffect> {
+    final override val location = this::class.simpleName!!.toRegistryName().toResourceLocation()
     final override val registryKey: ResourceKey<out Registry<MobEffect>> = BuiltInRegistries.MOB_EFFECT.key()
-
-    final override val location = this::class.simpleName!!
-        .toRegistryName()
-        .toResourceLocation()
-
 
     final override val holder: Holder<MobEffect> = DeferredHolder.create(
         ResourceKey.create(

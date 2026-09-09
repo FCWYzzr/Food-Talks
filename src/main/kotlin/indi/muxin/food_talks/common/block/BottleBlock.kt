@@ -1,22 +1,31 @@
 package indi.muxin.food_talks.common.block
 
+import com.mojang.logging.LogUtils
 import indi.muxin.food_talks.FoodTalks
-import indi.muxin.food_talks.common.block.entity.BottleBlockEntity
+import indi.muxin.food_talks.common.block.BottleBlock.MAX_FILL_LEVEL
+import indi.muxin.food_talks.common.block.BottleBlock.PROPERTY_FILL_LEVEL
+import indi.muxin.food_talks.common.block.BottleBlockEntity.AddItemResult.*
 import indi.muxin.food_talks.common.item.Cocktail
+import indi.muxin.food_talks.common.item.Cocktail.mergeMobEffectInstance
 import indi.muxin.food_talks.toRegistryName
 import indi.muxin.food_talks.toResourceLocation
 import indi.muxin.neoforged.registry.FRegistry
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
+import net.minecraft.core.HolderLookup
 import net.minecraft.core.Registry
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.NbtOps
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.ItemInteractionResult
+import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.player.Player
@@ -32,6 +41,8 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.EntityBlock
 import net.minecraft.world.level.block.SoundType
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.IntegerProperty
@@ -43,9 +54,189 @@ import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.neoforged.neoforge.registries.DeferredHolder
-import net.neoforged.neoforge.registries.RegisterEvent
+import org.slf4j.Logger
+import java.util.Optional
+import kotlin.collections.forEach
+import kotlin.jvm.optionals.getOrNull
 
-class BottleBlock private constructor(): Block(Properties.of().apply {
+class BottleBlockEntity(
+    pos: BlockPos,
+    state: BlockState
+): BlockEntity(instance, pos, state) {
+    var freeWaterLevel = 0
+    var upgrade = 0
+        private set
+    var extend = 0
+        private set
+    var detoxified = false
+        private set
+
+    val contents: Map<Holder<MobEffect>, MobEffectInstance>
+        field = mutableMapOf()
+
+    fun addPotion(effects: Iterable<MobEffectInstance>): Int {
+        val added = effects
+            .map { it.effect to it }
+            .map { (effect, instance) ->
+                effect to mergeMobEffectInstance(
+                    MobEffectInstance(effect, instance.duration / 8, instance.amplifier),
+                    contents[effect]
+                )
+            }
+            .map { (effect, instance) ->
+                contents[effect] = instance
+            }
+            .count()
+        setChanged()
+        return added
+    }
+    enum class AddItemResult {SUCCESS, SUCCESS_NO_GROW, FAIL}
+    fun addItem(state: BlockState, stack: ItemStack, player: Player, hand: InteractionHand): AddItemResult {
+        if (!stack.`is` {
+                val v = it.value()
+
+                return@`is` v == Items.POTION
+                        || v == Items.HONEY_BOTTLE
+                        || v == Items.GLOWSTONE_DUST
+                        || v == Items.REDSTONE
+                        || v == Items.OMINOUS_BOTTLE
+            })
+            return FAIL
+
+        val fillLevel = state.getValue(PROPERTY_FILL_LEVEL)
+
+        if (fillLevel == MAX_FILL_LEVEL)
+            return FAIL
+
+        return when {
+            stack.`is`(Items.HONEY_BOTTLE) -> {
+                if (freeWaterLevel < 2 || detoxified)
+                    FAIL
+                else {
+                    detoxified = true
+                    freeWaterLevel -= 2
+                    if (!player.hasInfiniteMaterials()) {
+                        stack.shrink(1)
+                        val newStack = ItemUtils.createFilledResult(
+                            stack, player, Items.GLASS_BOTTLE.defaultInstance)
+                        if (newStack !== stack)
+                            player.setItemInHand(
+                                hand, newStack)
+                    }
+                    SUCCESS
+                }
+            }
+
+            stack.`is`(Items.GLOWSTONE_DUST) || stack.`is`(Items.REDSTONE) -> {
+                if (freeWaterLevel < 1)
+                    FAIL
+                else{
+                    if (stack.`is`(Items.GLOWSTONE_DUST))
+                        ++ upgrade
+                    else
+                        ++ extend
+                    -- freeWaterLevel
+                    if (!player.hasInfiniteMaterials())
+                        stack.shrink(1)
+                    SUCCESS_NO_GROW
+                }
+            }
+
+            stack.`is`(Items.OMINOUS_BOTTLE) -> {
+                ++ freeWaterLevel
+                addPotion(arrayListOf(MobEffectInstance(
+                    MobEffects.BAD_OMEN,
+                    100 * 60 * 60 * FoodTalks.TPS,
+                    stack.components[DataComponents.OMINOUS_BOTTLE_AMPLIFIER] ?: 0
+                )))
+                if (!player.hasInfiniteMaterials())
+                    stack.shrink(1)
+                SUCCESS
+            }
+
+            else -> {
+                ++ freeWaterLevel
+                val effects = stack.components[DataComponents.POTION_CONTENTS] ?: PotionContents.EMPTY
+                if (addPotion(effects.allEffects) == 0)
+                    ++ freeWaterLevel
+
+                if (!player.hasInfiniteMaterials()){
+                    val newStack = ItemUtils.createFilledResult(
+                        stack, player,
+                        Items.GLASS_BOTTLE.defaultInstance
+                    )
+                    stack.shrink(1)
+                    if (newStack !== stack)
+                        player.setItemInHand(hand, newStack)
+                }
+                SUCCESS
+            }
+        }
+    }
+
+    override fun loadAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
+        super.loadAdditional(tag, registries)
+        contents.clear()
+
+        freeWaterLevel = tag.getInt("free_water_level")
+        detoxified = tag.getBoolean("detoxified")
+        upgrade = tag.getInt("upgrade")
+        extend = tag.getInt("extend")
+
+        tag.getList("contents", 10)
+            .map {
+                MobEffectInstance.CODEC.parse(
+                    registries.createSerializationContext(NbtOps.INSTANCE),
+                    it
+                ).resultOrPartial { name ->
+                    LOGGER.error("Tried to load invalid item: '{}'", name)
+                }
+            }.mapNotNull(Optional<MobEffectInstance>::getOrNull)
+            .forEach {
+                contents[it.effect] = it
+            }
+    }
+
+    override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
+        super.saveAdditional(tag, registries)
+        val contentTag = ListTag().apply {
+            contents.asIterable()
+                .map {
+                    MobEffectInstance.CODEC.encodeStart(
+                        registries.createSerializationContext(NbtOps.INSTANCE),
+                        it.value
+                    ).getOrThrow()
+                }
+                .forEach(::add)
+        }
+
+        tag.putInt("free_water_level", freeWaterLevel)
+        tag.putInt("upgrade", upgrade)
+        tag.putBoolean("detoxified", detoxified)
+        tag.put("contents", contentTag)
+        tag.putInt("extend", extend)
+
+    }
+
+
+    companion object: FRegistry<BlockEntityType<*>> {
+        private val LOGGER: Logger = LogUtils.getLogger()
+
+        @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "TYPE_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+        override val instance = BlockEntityType.Builder.of(
+            ::BottleBlockEntity,
+            BottleBlock
+        ).build(null) as BlockEntityType<BottleBlockEntity>
+        override val holder: Holder<BlockEntityType<*>> = Holder.direct(instance)
+
+        override val registryKey = BuiltInRegistries.BLOCK_ENTITY_TYPE.key() as ResourceKey<Registry<BlockEntityType<*>>>
+        override val location = "Bottle".toRegistryName().toResourceLocation()
+    }
+}
+
+
+
+object BottleBlock: Block(Properties.of().apply {
     instabreak()
     explosionResistance(0F)
     sound(SoundType.GLASS)
@@ -54,9 +245,7 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
     isViewBlocking { _, _, _ -> false }
     isValidSpawn{_, _, _, _-> false}
     pushReaction(PushReaction.DESTROY)
-}), EntityBlock{
-
-
+}), EntityBlock, FRegistry<Block> {
 
     private val outlineShape: VoxelShape = box(
         4.0, 0.0, 4.0,
@@ -102,7 +291,8 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
                 level,
                 pos
             )
-        ) Blocks.AIR.defaultBlockState()
+        )
+            Blocks.AIR.defaultBlockState()
         else
             super.updateShape(
             state,
@@ -117,7 +307,7 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
     override fun getDrops(state: BlockState, params: LootParams.Builder): MutableList<ItemStack> {
         val entity = params.getParameter(LootContextParams.BLOCK_ENTITY) as BottleBlockEntity
         val fillLevel = state.getValue(PROPERTY_FILL_LEVEL)
-        return mutableListOf(Cocktail.buildFromBottle(entity, fillLevel))
+        return arrayListOf(Cocktail.buildFromBottle(entity, fillLevel))
     }
 
     /**
@@ -130,7 +320,7 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
         player: Player,
         hitResult: BlockHitResult
     ): InteractionResult {
-        if (! player.isShiftKeyDown)
+        if (! player.isCrouching)
             return InteractionResult.PASS
 
 
@@ -164,101 +354,16 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
         })
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
 
-        val fillLevel = state.getValue(PROPERTY_FILL_LEVEL)
         val entity = level.getBlockEntity(pos) as BottleBlockEntity
 
-        val (result, newState) = when{
-            stack.`is`(Items.HONEY_BOTTLE) -> {
-                if (fillLevel == MAX_FILL_LEVEL)
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
-                else if (!entity.allowNewCondiment(2))
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
-                else if (! entity.detoxify()) {
-                    val newState = state.setValue(PROPERTY_FILL_LEVEL, fillLevel+1)
-                    if (!player.hasInfiniteMaterials()) {
-                        val newStack = ItemUtils.createFilledResult(
-                            stack, player, Items.GLASS_BOTTLE.defaultInstance
-                        )
-                        if (newStack !== stack)
-                            player.setItemInHand(
-                                hand, newStack
-                            )
-                    }
+        val ret = entity.addItem(state, stack, player, hand)
+        if (ret ==  SUCCESS)
+            level.setBlockAndUpdate(pos, state.setValue(PROPERTY_FILL_LEVEL, state.getValue(PROPERTY_FILL_LEVEL) + 1))
 
-
-                    ItemInteractionResult.SUCCESS to newState
-                }
-                else
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
-            }
-
-            stack.`is`(Items.GLOWSTONE_DUST) -> {
-                if (!entity.allowNewCondiment(1))
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
-                else{
-                    entity.upgrade()
-                    if (!player.hasInfiniteMaterials())
-                        stack.shrink(1)
-                    ItemInteractionResult.SUCCESS to state
-                }
-            }
-
-            stack.`is`(Items.REDSTONE) -> {
-                if (!entity.allowNewCondiment(1))
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
-                else{
-                    entity.extend()
-                    if (!player.hasInfiniteMaterials())
-                        stack.shrink(1)
-                    ItemInteractionResult.SUCCESS to state
-                }
-            }
-
-            stack.`is`(Items.OMINOUS_BOTTLE) -> {
-                if (fillLevel == MAX_FILL_LEVEL)
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
-                else {
-                    val newState = state.setValue(PROPERTY_FILL_LEVEL, fillLevel+1)
-
-                    entity.addPotion(arrayListOf(MobEffectInstance(
-                        MobEffects.BAD_OMEN,
-                        100 * 60 * 60 * FoodTalks.TPS,
-                        stack.components[DataComponents.OMINOUS_BOTTLE_AMPLIFIER] ?: 0
-                    )))
-
-                    ItemInteractionResult.SUCCESS to newState
-                }
-            }
-
-            else -> {
-                if (fillLevel == MAX_FILL_LEVEL)
-                    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION to null
-                else {
-                    val newState = state.setValue(PROPERTY_FILL_LEVEL, fillLevel+1)
-
-                    entity.addPotion((stack
-                        .components[DataComponents.POTION_CONTENTS] ?: PotionContents.EMPTY)
-                        .allEffects
-                    )
-
-                    if (!player.hasInfiniteMaterials()){
-                        val newStack = ItemUtils.createFilledResult(
-                            stack, player,
-                            Items.GLASS_BOTTLE.defaultInstance
-                        )
-                        if (newStack !== stack)
-                            player.setItemInHand(hand, newStack)
-                    }
-
-                    ItemInteractionResult.SUCCESS to newState
-                }
-            }
-        }
-
-        if (newState !== null)
-            level.setBlockAndUpdate(pos, newState)
-
-        return result
+        return if (ret == FAIL)
+            ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+        else
+            ItemInteractionResult.SUCCESS
     }
 
     override fun getCloneItemStack(
@@ -272,24 +377,23 @@ class BottleBlock private constructor(): Block(Properties.of().apply {
     }
 
 
-    companion object: FRegistry<Block>{
-        override val registryKey: ResourceKey<out Registry<Block>> = BuiltInRegistries
-            .BLOCK.key()
 
-        val name = "Bottle".toRegistryName()
-        override val location = name.toResourceLocation()
-        override val holder: Holder<Block> = DeferredHolder
-            .create(registryKey, location)
+    override val registryKey: ResourceKey<out Registry<Block>> = BuiltInRegistries
+        .BLOCK.key()
 
-        @JvmStatic
-        val PROPERTY_FILL_LEVEL: IntegerProperty = IntegerProperty.create("fill_level", 0, 8)
-        const val MAX_FILL_LEVEL = 8
+    override val location = "Bottle".toRegistryName().toResourceLocation()
+    override val holder: Holder<Block> = DeferredHolder
+        .create(registryKey, location)
 
-        val instance = BottleBlock()
-
-        override fun registerByHelper(helper: RegisterEvent.RegisterHelper<Block>) {
-            helper.register(location, instance)
+    const val MAX_FILL_LEVEL = 8
+    @JvmStatic
+    val PROPERTY_FILL_LEVEL: IntegerProperty
+        get() {
+            if (propertyFillLevel == null)
+                propertyFillLevel = IntegerProperty.create("fill_level", 0, MAX_FILL_LEVEL)
+            return propertyFillLevel!!
         }
-    }
+    var propertyFillLevel: IntegerProperty? = null
+
 }
 

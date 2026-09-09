@@ -1,0 +1,67 @@
+{
+  "values": {
+    "#food_talks:food_category/drinks": {
+      "effect": "minecraft:nausea",
+      "durationBase": 600,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "#food_talks:food_category/drugs": {
+      "effect": "minecraft:poison",
+      "durationBase": 600,
+      "durationUnit": 600,
+      "amplifierBase": 2,
+      "amplifierUnit": 1
+    },
+    "#food_talks:food_category/fleshes": {
+      "effect": "food_talks:vomit",
+      "durationBase": 100,
+      "durationUnit": 100,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "#food_talks:food_category/fruits": {
+      "effect": "food_talks:toothache",
+      "durationBase": 600,
+      "durationUnit": 600,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "#food_talks:food_category/meats": {
+      "effect": "food_talks:gout",
+      "durationBase": 600,
+      "durationUnit": 600,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "#food_talks:food_category/snacks": {
+      "effect": "food_talks:overweight",
+      "durationBase": 600,
+      "durationUnit": 600,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "#food_talks:food_category/soup": {
+      "effect": "minecraft:hunger",
+      "durationBase": 600,
+      "durationUnit": 600,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "#food_talks:food_category/staples": {
+      "effect": "food_talks:anorexia",
+      "durationBase": 600,
+      "durationUnit": 600,
+      "amplifierBase": 0,
+      "amplifierUnit": 0
+    },
+    "#food_talks:food_category/vegetables": {
+      "effect": "minecraft:weakness",
+      "durationBase": 600,
+      "durationUnit": 600,
+      "amplifierBase": 0,
+      "amplifierUnit": 1
+    }
+  }
+}
