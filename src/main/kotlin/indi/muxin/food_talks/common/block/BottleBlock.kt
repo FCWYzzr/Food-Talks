@@ -1,6 +1,6 @@
 package indi.muxin.food_talks.common.block
 
-import com.mojang.logging.LogUtils
+
 import indi.muxin.food_talks.FoodTalks
 import indi.muxin.food_talks.common.block.BottleBlock.MAX_FILL_LEVEL
 import indi.muxin.food_talks.common.block.BottleBlock.PROPERTY_FILL_LEVEL
@@ -54,7 +54,6 @@ import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.neoforged.neoforge.registries.DeferredHolder
-import org.slf4j.Logger
 import java.util.Optional
 import kotlin.collections.forEach
 import kotlin.jvm.optionals.getOrNull
@@ -189,7 +188,7 @@ class BottleBlockEntity(
                     registries.createSerializationContext(NbtOps.INSTANCE),
                     it
                 ).resultOrPartial { name ->
-                    LOGGER.error("Tried to load invalid item: '{}'", name)
+                    FoodTalks.logger.error("Tried to load invalid item: '{}'", name)
                 }
             }.mapNotNull(Optional<MobEffectInstance>::getOrNull)
             .forEach {
@@ -220,7 +219,6 @@ class BottleBlockEntity(
 
 
     companion object: FRegistry<BlockEntityType<*>> {
-        private val LOGGER: Logger = LogUtils.getLogger()
 
         @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "TYPE_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
         override val instance = BlockEntityType.Builder.of(

@@ -1,21 +1,23 @@
 import org.slf4j.event.Level
 
-val minecraft_version           = project.findProperty("minecraft_version          ".trim()) as String 
-val minecraft_version_range     = project.findProperty("minecraft_version_range    ".trim()) as String 
-val neo_version                 = project.findProperty("neo_version                ".trim()) as String 
-val neo_version_range           = project.findProperty("neo_version_range          ".trim()) as String 
-val loader_version_range        = project.findProperty("loader_version_range       ".trim()) as String 
-val mod_id                      = project.findProperty("mod_id                     ".trim()) as String 
-val mod_name                    = project.findProperty("mod_name                   ".trim()) as String 
-val mod_license                 = project.findProperty("mod_license                ".trim()) as String 
-val mod_version                 = project.findProperty("mod_version                ".trim()) as String 
-val mod_authors                 = project.findProperty("mod_authors                ".trim()) as String 
-val mod_description             = project.findProperty("mod_description            ".trim()) as String 
-val mod_group_id                = project.findProperty("mod_group_id               ".trim()) as String 
-val parchment_mappings_version  = project.findProperty("parchment_mappings_version ".trim()) as String 
-val parchment_minecraft_version = project.findProperty("parchment_minecraft_version".trim()) as String 
-val kff_version                 = project.findProperty("kff_version                ".trim()) as String
-val jei_version                 = project.findProperty("jei_version                ".trim()) as String
+val minecraftVersion            get() = project.findProperty("minecraft_version             ".trim()) as String
+val minecraftVersionRange       get() = project.findProperty("minecraft_version_range       ".trim()) as String
+val neoVersion                  get() = project.findProperty("neo_version                   ".trim()) as String
+val neoVersionRange             get() = project.findProperty("neo_version_range             ".trim()) as String
+val loaderVersionRange          get() = project.findProperty("loader_version_range          ".trim()) as String
+val modId                       get() = project.findProperty("mod_id                        ".trim()) as String
+val modName                     get() = project.findProperty("mod_name                      ".trim()) as String
+val modLicense                  get() = project.findProperty("mod_license                   ".trim()) as String
+val modVersion                  get() = project.findProperty("mod_version                   ".trim()) as String
+val modAuthors                  get() = project.findProperty("mod_authors                   ".trim()) as String
+val modDescription              get() = project.findProperty("mod_description               ".trim()) as String
+val modGroupId                  get() = project.findProperty("mod_group_id                  ".trim()) as String
+val parchmentMappingsVersion    get() = project.findProperty("parchment_mappings_version    ".trim()) as String
+val parchmentMinecraftVersion   get() = project.findProperty("parchment_minecraft_version   ".trim()) as String
+val kffVersion                  get() = project.findProperty("kff_version                   ".trim()) as String
+val jeiVersion                  get() = project.findProperty("jei_version                   ".trim()) as String
+val ponderVersion               get() = project.findProperty("ponder_version                ".trim()) as String
+val flywheelVersion               get() = project.findProperty("flywheel_version                ".trim()) as String
 
 
 plugins {
@@ -32,11 +34,11 @@ tasks.wrapper {
     distributionType = Wrapper.DistributionType.BIN
 }
 
-version = mod_version
-group = mod_group_id
+version = modVersion
+group = modGroupId
 
 base {
-    archivesName = mod_id
+    archivesName = modId
 }
 
 // Mojang ships Java 21 to end users starting in 1.20.5, so mods should target Java 21.
@@ -44,11 +46,11 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 neoForge {
     // Specify the version of NeoForge to use.
-    version = neo_version
+    version = neoVersion
 
     parchment {
-        mappingsVersion = parchment_mappings_version
-        minecraftVersion = parchment_minecraft_version
+        mappingsVersion = parchmentMappingsVersion
+        minecraftVersion = parchmentMinecraftVersion
     }
 
     // This line is optional. Access Transformers are automatically detected
@@ -61,13 +63,13 @@ neoForge {
             client()
 
             // Comma-separated list of namespaces to load game-tests from. Empty = all namespaces.
-            systemProperty("neoforge.enabledGameTestNamespaces", mod_id)
+            systemProperty("neoforge.enabledGameTestNamespaces", modId)
         }
 
         create("server") {
             server()
             programArgument("--nogui")
-            systemProperty("neoforge.enabledGameTestNamespaces", mod_id)
+            systemProperty("neoforge.enabledGameTestNamespaces", modId)
         }
 
         // This run config launches GameTestServer and runs all registered game-tests, then exits.
@@ -75,7 +77,7 @@ neoForge {
         // The game-test system is also enabled by default for other run configs under the /test command.
         create("gameTestServer") {
             type = "gameTestServer"
-            systemProperty("neoforge.enabledGameTestNamespaces", mod_id)
+            systemProperty("neoforge.enabledGameTestNamespaces", modId)
         }
 
         create("data") {
@@ -85,7 +87,7 @@ neoForge {
             // gameDirectory = project.file('run-data')
 
             // Specify the mod id for data generation, where to output the resulting resource, and where to look for existing resources.
-            programArguments.addAll("--mod", mod_id, "--all", "--output", file("src/generated/resources/").absolutePath, "--existing", file("src/main/resources/").absolutePath)
+            programArguments.addAll("--mod", modId, "--all", "--output", file("src/generated/resources/").absolutePath, "--existing", file("src/main/resources/").absolutePath)
         }
 
         // applies to all the run configs above
@@ -109,7 +111,7 @@ neoForge {
         // these are used to tell the game which sources are for which mod
         // mostly optional in a single mod project
         // but multi mod projects should define one per mod
-        create(mod_id) {
+        create(modId) {
             sourceSet(sourceSets.main.get())
         }
     }
@@ -156,32 +158,41 @@ repositories {
     }
 
     maven {
+        url = uri("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
+    }
+    maven {
+        url = uri("https://maven.createmod.net")
+    }
+
+    maven {
         url = uri("https://repo.spongepowered.org/repository/maven-public/")
     }
 }
 
 dependencies {
-    // implementation "net.neoforged:neoforge:${neo_version}"
-    // annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-
-    compileOnly("thedarkcolour:kotlinforforge-neoforge:${kff_version}")
+    implementation("net.createmod.ponder:ponder-neoforge:${ponderVersion}+mc${minecraftVersion}")
+    implementation("dev.engine-room.flywheel:flywheel-neoforge-api-${minecraftVersion}:${flywheelVersion}")
+    compileOnly("thedarkcolour:kotlinforforge-neoforge:${kffVersion}")
+    compileOnly("mezz.jei:jei-${minecraftVersion}-neoforge-api:${jeiVersion}")
+    runtimeOnly("mezz.jei:jei-${minecraftVersion}-neoforge:${jeiVersion}")
 }
 
 tasks.withType<ProcessResources>().configureEach {
     val replaceProperties = mapOf(
-            "minecraft_version" to minecraft_version,
-            "minecraft_version_range" to minecraft_version_range,
-            "kff_version_range" to "[${kff_version},)",
-            "jei_version_range" to "[${jei_version},)",
-            "neo_version" to neo_version,
-            "neo_version_range" to neo_version_range,
-            "loader_version_range" to loader_version_range,
-            "mod_id" to mod_id,
-            "mod_name" to mod_name,
-            "mod_license" to mod_license,
-            "mod_version" to mod_version,
-            "mod_authors" to mod_authors,
-            "mod_description" to mod_description
+            "minecraft_version" to minecraftVersion,
+            "minecraft_version_range" to minecraftVersionRange,
+            "kff_version_range" to "[${kffVersion},)",
+            "jei_version_range" to "[${jeiVersion},)",
+            "flywheel_version_range" to "[${flywheelVersion},)",
+            "neo_version" to neoVersion,
+            "neo_version_range" to neoVersionRange,
+            "loader_version_range" to loaderVersionRange,
+            "mod_id" to modId,
+            "mod_name" to modName,
+            "mod_license" to modLicense,
+            "mod_version" to modVersion,
+            "mod_authors" to modAuthors,
+            "mod_description" to modDescription
     )
     inputs.properties(replaceProperties)
 

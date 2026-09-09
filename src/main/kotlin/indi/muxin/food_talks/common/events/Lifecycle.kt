@@ -1,6 +1,7 @@
 package indi.muxin.food_talks.common.events
 
 import indi.muxin.food_talks.FoodTalks
+import indi.muxin.food_talks.FoodTalks.MOD_ID
 import indi.muxin.food_talks.common.block.BottleBlock
 import indi.muxin.food_talks.common.block.BottleBlockEntity
 import indi.muxin.food_talks.common.block.PlateBlock
@@ -11,23 +12,17 @@ import indi.muxin.food_talks.common.data_components.registerSimpleDataComponents
 import indi.muxin.food_talks.common.item.Cocktail
 import indi.muxin.food_talks.common.item.Plate
 import indi.muxin.food_talks.common.item.Sandwich
-import indi.muxin.food_talks.common.mob_effect.Anorexia
-import indi.muxin.food_talks.common.mob_effect.DarknessInfused
-import indi.muxin.food_talks.common.mob_effect.EndlessTreasure
-import indi.muxin.food_talks.common.mob_effect.Gout
-import indi.muxin.food_talks.common.mob_effect.Happy
-import indi.muxin.food_talks.common.mob_effect.Overweight
-import indi.muxin.food_talks.common.mob_effect.PoisonResistance
-import indi.muxin.food_talks.common.mob_effect.ProjectileImmune
-import indi.muxin.food_talks.common.mob_effect.ScapeGoat
-import indi.muxin.food_talks.common.mob_effect.Smelly
-import indi.muxin.food_talks.common.mob_effect.Starving
-import indi.muxin.food_talks.common.mob_effect.Toothache
-import indi.muxin.food_talks.common.mob_effect.Treasure
-import indi.muxin.food_talks.common.mob_effect.Vomit
+import indi.muxin.food_talks.common.mob_effect.*
 import indi.muxin.food_talks.common.registries.FoodItemReward
 import indi.muxin.food_talks.common.registries.FoodTagPunishment
+import indi.muxin.food_talks.toResourceLocation
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.Registries
+import net.minecraft.network.chat.Component
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.item.CreativeModeTab
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.alchemy.Potion
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -35,7 +30,7 @@ import net.neoforged.neoforge.registries.RegisterEvent
 import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent
 
 @EventBusSubscriber(
-    modid = FoodTalks.MOD_ID,
+    modid = MOD_ID,
     value = [Dist.CLIENT, Dist.DEDICATED_SERVER]
 )
 object Lifecycle {
@@ -55,7 +50,7 @@ object Lifecycle {
     }
 
     @SubscribeEvent
-    fun registerEffect(event: RegisterEvent){
+    fun registerEffectAndPotions(event: RegisterEvent){
         arrayOf(
             Anorexia,
             Gout,
@@ -73,11 +68,15 @@ object Lifecycle {
             ScapeGoat
         ).forEach {
             it registerTo event
+            event.register(Registries.POTION) { rh ->
+                rh.register(it.location,
+                    Potion(MobEffectInstance(it.holder, 30 * FoodTalks.TPS)))
+            }
         }
     }
 
     @SubscribeEvent
-    fun registerBlocks(event: RegisterEvent){
+    fun registerItemBlocksAndTab(event: RegisterEvent){
         BottleBlock registerTo event
         PlateBlock  registerTo event
 
@@ -87,5 +86,17 @@ object Lifecycle {
         Cocktail    registerTo event
         Plate       registerTo event
         Sandwich    registerTo event
+
+        event.register(Registries.CREATIVE_MODE_TAB){
+            it.register("creative_tab".toResourceLocation(), CreativeModeTab.builder()
+                .icon { ItemStack(Plate) }
+                .title(Component.translatable("itemGroup.${MOD_ID}.ft_tab")) // 设置名称
+                .displayItems { _, output ->
+                    output.accept(Plate)
+                }
+                .build())
+        }
     }
+
+
 }

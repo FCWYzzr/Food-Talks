@@ -210,13 +210,6 @@ object Gameplay {
     }
 
     private fun calculateTreasureDrop(event: BlockEvent, player: Player, level: ServerLevel, tool: ItemStack): List<ItemStack> {
-        val treasureLevel = player.getEffect(Treasure.holder) ?.amplifier ?: return emptyList()
-        val multiply = Mth.randomBetween(
-            FoodTalks.random,
-            treasureLevel * 0.1F + 1F,
-            treasureLevel * 0.3F + 1.3F
-        )
-
         val drops = Block.getDrops(
             event.state,
             level,
@@ -224,6 +217,13 @@ object Gameplay {
             level.getBlockEntity(event.pos),
             player,
             tool
+        )
+
+        val treasureLevel = player.getEffect(Treasure.holder) ?.amplifier ?: return drops
+        val multiply = Mth.randomBetween(
+            FoodTalks.random,
+            treasureLevel * 0.1F + 1F,
+            treasureLevel * 0.3F + 1.3F
         )
 
         drops.forEach {
@@ -256,6 +256,8 @@ object Gameplay {
     fun miningDuringTreasure(event: BlockDropsEvent){
         if (shouldIgnoreMiningEvent(event, event.breaker as? Player? ?: return))
            return
+        if (!(event.breaker as Player).hasEffect(Treasure.holder))
+            return
         event.drops.clear()
         calculateTreasureDrop(event, event.breaker as Player, event.level as ServerLevel, (event.breaker as Player).mainHandItem).forEach {
             event.drops.add(ItemEntity(event.level,

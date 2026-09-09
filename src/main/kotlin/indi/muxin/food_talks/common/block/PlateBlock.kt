@@ -1,8 +1,8 @@
 package indi.muxin.food_talks.common.block
 
 import com.mojang.datafixers.types.Type
-import com.mojang.logging.LogUtils
 import com.mojang.serialization.Codec
+import indi.muxin.food_talks.FoodTalks
 import indi.muxin.food_talks.common.item.CompoundFood
 import indi.muxin.food_talks.common.item.Plate
 import indi.muxin.food_talks.common.item.Sandwich
@@ -50,7 +50,6 @@ import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.RegisterEvent
-import org.slf4j.Logger
 import java.util.*
 import kotlin.jvm.optionals.getOrDefault
 import kotlin.jvm.optionals.getOrNull
@@ -184,14 +183,14 @@ class PlateBlockEntity(
                 val displayMode = Codec.INT.parse(ops, this).map {
                     Mode.entries[it]
                 } .resultOrPartial { name ->
-                    LOGGER.warn("Tried to load invalid display mode: '{}'", name)
+                    FoodTalks.logger.warn("Tried to load invalid display mode: '{}'", name)
                 }
                 mode = displayMode.getOrDefault(Mode.DISPLAY)
             }
         tag.get("item")
             ?.apply {
                 val displayItem = ItemStack.SINGLE_ITEM_CODEC.parse(ops, this).resultOrPartial { name ->
-                    LOGGER.warn("Tried to load invalid display item: '{}'", name)
+                    FoodTalks.logger.warn("Tried to load invalid display item: '{}'", name)
                 }
                 item = displayItem.getOrDefault(ItemStack.EMPTY)
             }
@@ -199,7 +198,7 @@ class PlateBlockEntity(
             .asIterable()
             .map {
                 ItemStack.CODEC.parse(ops, it).resultOrPartial { name ->
-                    LOGGER.warn("Tried to load invalid ingredient: '{}'", name)
+                    FoodTalks.logger.warn("Tried to load invalid ingredient: '{}'", name)
                 }
             }.mapNotNull(Optional<ItemStack>::getOrNull)
             .forEach(ingredients::add)
@@ -250,8 +249,6 @@ class PlateBlockEntity(
 
 
     companion object {
-        private val LOGGER: Logger = LogUtils.getLogger()
-
         private const val MAX_LAYER = 20
 
         @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "TYPE_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
