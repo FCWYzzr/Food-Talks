@@ -24,10 +24,13 @@ class ItemMixin {
         usedHand: InteractionHand,
         cir: CallbackInfoReturnable<InteractionResultHolder<ItemStack?>?>
     ) {
-        if (cir.getReturnValue()!!.result != InteractionResult.CONSUME) return
+        if (cir.getReturnValue()!!.result != InteractionResult.CONSUME)
+            return
         val item = player.getItemInHand(usedHand)
-        if (!isFood(item, false)) return
+        if (!isFood(item, false))
+            return
 
-        if (!canEat(item, player)) cir.setReturnValue(InteractionResultHolder.fail(item))
+        if (!canEat(item, player))
+            cir.setReturnValue(InteractionResultHolder.fail(item))
     }
 }

@@ -5,7 +5,7 @@ import indi.muxin.food_talks.FoodTalks
 import indi.muxin.food_talks.common.item.CompoundFood
 import indi.muxin.food_talks.common.mob_effect.EndlessTreasure
 import indi.muxin.food_talks.common.mob_effect.Treasure
-import indi.muxin.food_talks.common.mob_effect.ScapeGoat
+import indi.muxin.food_talks.common.mob_effect.Scapegoat
 import indi.muxin.food_talks.common.mob_effect.PoisonResistance
 import indi.muxin.food_talks.common.mob_effect.Smelly
 import indi.muxin.food_talks.common.mob_effect.Starving
@@ -282,12 +282,12 @@ object Gameplay {
     fun oneMoreChance(event: LivingDeathEvent){
         if (event.entity.level().isClientSide)
             return
-        if (!event.entity.hasEffect(ScapeGoat.holder))
+        if (!event.entity.hasEffect(Scapegoat.holder))
             return
 
         event.isCanceled = true
         event.entity.health = event.entity.maxHealth
-        event.entity.removeEffect(ScapeGoat.holder)
+        event.entity.removeEffect(Scapegoat.holder)
         event.entity.addEffect(MobEffectInstance(MobEffects.DARKNESS, 20))
         if (event.entity.level().isClientSide)
             return

@@ -73,6 +73,6 @@ object Starving: FMobEffect(
     MobEffectCategory.BENEFICIAL, 0xa42312
 )
 
-object ScapeGoat: FMobEffect(
+object Scapegoat: FMobEffect(
     MobEffectCategory.BENEFICIAL, 0x000000
 )
