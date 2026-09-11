@@ -23,8 +23,24 @@
 
   "itemGroup.food_talks.ft_tab": "Food Talks",
 
+  "food_talks.ponder.scene.sandwich_assembly.header": "Assembly Sandwich",
+  "food_talks.ponder.scene.sandwich_assembly.text_1": "Use plate to assembly sandwiches.",
+  "food_talks.ponder.scene.sandwich_assembly.text_2": "Put a piece of bread at the bottom...",
+  "food_talks.ponder.scene.sandwich_assembly.text_3": "Put your favourite ingredients...",
+  "food_talks.ponder.scene.sandwich_assembly.text_4": "And cover them with another piece of bread.",
+  "food_talks.ponder.scene.sandwich_assembly.text_5": "Take your sandwich and give it a bite!",
+  "food_talks.ponder.scene.sandwich_assembly.text_6": "Sneak click to cancel",
+
+  "food_talks.ponder.scene.cocktail_assembly.header": "Assembly Cocktail",
+  "food_talks.ponder.scene.cocktail_assembly.text_1": "Glass bottle now can be placed in the world.",
+  "food_talks.ponder.scene.cocktail_assembly.text_2": "You can pour potions into it (max 8). Each water bottle grants 1 extra 'free water level'",
+  "food_talks.ponder.scene.cocktail_assembly.text_3": "Redstone cost 1 free water level to extend effect duration by 1",
+  "food_talks.ponder.scene.cocktail_assembly.text_4": "Glow stone dust cost 1 free water level to upgrade effect level by 1",
+  "food_talks.ponder.scene.cocktail_assembly.text_5": "Honey bottle cost 2 free water level to remove all negative effects",
+  "food_talks.ponder.scene.cocktail_assembly.text_6": "Sneak click or break it to get your cocktail.",
+
   "death.attack.toothache": "%1$s 's teeth was shattered into pieces.",
-  "death.attack.gout": "%1$s 's joint exploded.",
+  "death.attack.gout": "%1$s 's joint explodes.",
 
   "item.minecraft.potion.effect.poison_resistance":  "Potion of Poison Resistance",
   "item.minecraft.potion.effect.darkness_infused":   "Potion of Darkness Infused",

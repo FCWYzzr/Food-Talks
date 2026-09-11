@@ -22,6 +22,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.item.CreativeModeTab
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import net.minecraft.world.item.alchemy.Potion
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
@@ -51,22 +52,20 @@ object Lifecycle {
 
     @SubscribeEvent
     fun registerEffectAndPotions(event: RegisterEvent){
-        arrayOf(
-            Anorexia,
-            Gout,
-            Toothache,
-            Vomit,
-            Overweight,
-            PoisonResistance,
-            DarknessInfused,
-            Treasure,
-            EndlessTreasure,
-            Smelly,
-            Happy,
-            ProjectileImmune,
-            Starving,
-            ScapeGoat
-        ).forEach {
+        for (it in arrayOf(Anorexia,
+                Gout,
+                Toothache,
+                Vomit,
+                Overweight,
+                PoisonResistance,
+                DarknessInfused,
+                Treasure,
+                EndlessTreasure,
+                Smelly,
+                Happy,
+                ProjectileImmune,
+                Starving,
+                Scapegoat)) {
             it registerTo event
             event.register(Registries.POTION) { rh ->
                 rh.register(it.location,
@@ -93,6 +92,7 @@ object Lifecycle {
                 .title(Component.translatable("itemGroup.${MOD_ID}.ft_tab")) // 设置名称
                 .displayItems { _, output ->
                     output.accept(Plate)
+                    output.accept(Items.GLASS_BOTTLE.defaultInstance)
                 }
                 .build())
         }

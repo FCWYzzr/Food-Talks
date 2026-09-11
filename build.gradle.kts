@@ -171,7 +171,6 @@ repositories {
 
 dependencies {
     implementation("net.createmod.ponder:ponder-neoforge:${ponderVersion}+mc${minecraftVersion}")
-    implementation("dev.engine-room.flywheel:flywheel-neoforge-api-${minecraftVersion}:${flywheelVersion}")
     compileOnly("thedarkcolour:kotlinforforge-neoforge:${kffVersion}")
     compileOnly("mezz.jei:jei-${minecraftVersion}-neoforge-api:${jeiVersion}")
     runtimeOnly("mezz.jei:jei-${minecraftVersion}-neoforge:${jeiVersion}")
@@ -184,6 +183,7 @@ tasks.withType<ProcessResources>().configureEach {
             "kff_version_range" to "[${kffVersion},)",
             "jei_version_range" to "[${jeiVersion},)",
             "flywheel_version_range" to "[${flywheelVersion},)",
+            "ponder_version_range" to "[${ponderVersion},)",
             "neo_version" to neoVersion,
             "neo_version_range" to neoVersionRange,
             "loader_version_range" to loaderVersionRange,

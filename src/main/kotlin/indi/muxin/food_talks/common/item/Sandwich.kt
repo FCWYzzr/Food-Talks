@@ -7,6 +7,9 @@ import indi.muxin.food_talks.common.data_components.FoodStackPropertiesDCType
 import indi.muxin.food_talks.common.data_components.PossibleEffectListDCType
 import indi.muxin.food_talks.common.data_components.SandwichLayerDCType
 import indi.muxin.food_talks.common.mixin.mechanic.MobEffectInstanceAccessor
+import indi.muxin.food_talks.common.mob_effect.applyEffects
+import indi.muxin.food_talks.common.mob_effect.describeEffects
+import indi.muxin.food_talks.common.mob_effect.mergeWeightedEffects
 import indi.muxin.food_talks.common.registries.FoodItemReward
 import indi.muxin.food_talks.common.registries.FoodTagPunishment
 import indi.muxin.food_talks.toResourceLocation
@@ -71,7 +74,7 @@ object Sandwich: CompoundFood(
             )
 
             // apply effects
-            Cocktail.mergePotionContent(effect, entity)
+            entity.applyEffects(effect)
         }
 
         val food = itemStack.components[FoodStackPropertiesDCType]
@@ -86,21 +89,17 @@ object Sandwich: CompoundFood(
      * note:
      * ingredients will be compiled, item infos stored for rendering only
      */
-    fun assemblyFromPlate(entity: PlateBlockEntity): ItemStack = buildItemStack {
-        // optimize for client
-        if (entity.level ?.isClientSide != false)
-            return@buildItemStack
+    fun assemblyFromPlate(entity: PlateBlockEntity) = assemblyFromIngredientList(entity.ingredients)
 
-        set(SandwichLayerDCType, entity.ingredients.map(ItemStack::getItemHolder))
+    fun assemblyFromIngredientList(ingredients: List<ItemStack>): ItemStack = buildItemStack {
+        set(SandwichLayerDCType, ingredients.map(ItemStack::getItemHolder))
 
         // food & potion property
-        val (bites, nutrition, saturation, effectFolder) = entity
-            .ingredients
+        val (bites, nutrition, saturation, effectFolder) = ingredients
             .fold(IngredientFolder(), IngredientFolder::fold)
             .unpack()
 
-        entity
-            .ingredients
+        ingredients
             .asSequence()
             .drop(1)
             .map { mapOf(it.itemHolder to 1)  }
@@ -113,8 +112,7 @@ object Sandwich: CompoundFood(
             }
             .fold(effectFolder, EffectFolder::fold)
 
-        val tagCounter = entity
-            .ingredients
+        val tagCounter = ingredients
             .drop(1)
             .dropLast(1)
             .asSequence()
@@ -127,7 +125,7 @@ object Sandwich: CompoundFood(
             .fold(0){i, _ -> i + 1}
             .toMap()
 
-        val tagPunishmentThreshold1 = entity.ingredients.size / 2        // 50%, 0
+        val tagPunishmentThreshold1 = ingredients.size / 2        // 50%, 0
 //        val tagPunishmentThreshold2 = entity.ingredients.size * 3 / 4    // 100%, 5
 
         val (possibleEffects, mustEffects) = tagCounter
@@ -137,8 +135,8 @@ object Sandwich: CompoundFood(
                     .first()
                     .getData(FoodTagPunishment.type) ?: return@mapNotNull null
 
-                val prob = (v - tagPunishmentThreshold1) * 2.0F / entity.ingredients.size  + 0.5F
-                val level = (v - tagPunishmentThreshold1) * 20.0F / entity.ingredients.size
+                val prob = (v - tagPunishmentThreshold1) * 2.0F / ingredients.size  + 0.5F
+                val level = (v - tagPunishmentThreshold1) * 20.0F / ingredients.size
                 punishment.calculate(ceil(level).toInt()) to prob
             }.fold(effectFolder, EffectFolder::fold)
             .pack(bites)
@@ -147,7 +145,7 @@ object Sandwich: CompoundFood(
         // final assembly
 
         val nutPerBite = Mth.ceil(nutrition.toFloat() * 3 / bites)
-        val satPerBite = saturation / entity.ingredients.size
+        val satPerBite = saturation / ingredients.size
 
         set(FoodStackPropertiesDCType, FoodStackProperties(nutPerBite, satPerBite))
         set(PossibleEffectListDCType, possibleEffects.map {
@@ -162,7 +160,7 @@ object Sandwich: CompoundFood(
         set(DataComponents.MAX_DAMAGE, bites)
         set(DataComponents.LORE, itemLoreFromDetail(
             nutPerBite, satPerBite, bites,
-            possibleEffects, mustEffects, entity.ingredients))
+            possibleEffects, mustEffects, ingredients))
     }
 
     private fun itemLoreFromDetail(
@@ -222,32 +220,6 @@ object Sandwich: CompoundFood(
 
 
             return this
-        }
-
-        companion object {
-            fun mergeWeightedEffects(
-                baseEffect: MobEffectInstance,
-                baseProb: Float,
-                addonEffect: MobEffectInstance,
-                addonProb: Float
-            ): Pair<MobEffectInstance, Float> {
-                if (baseEffect.amplifier < addonEffect.amplifier)
-                    return mergeWeightedEffects(
-                        addonEffect, addonProb,
-                        baseEffect, baseProb
-                    )
-                // convert levels:
-                val effect = Cocktail.mergeMobEffectInstance(addonEffect, baseEffect)
-                val prob = baseProb + addonProb * (addonEffect.amplifier + 1) / (addonEffect.amplifier + 1)
-
-                return if (prob < 1F)
-                    effect to prob
-                else {
-                    (effect as MobEffectInstanceAccessor)
-                        .setDuration((effect.duration * prob).toInt())
-                    effect to 1F
-                }
-            }
         }
     }
 

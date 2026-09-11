@@ -6,7 +6,7 @@ import indi.muxin.food_talks.common.block.BottleBlock.MAX_FILL_LEVEL
 import indi.muxin.food_talks.common.block.BottleBlock.PROPERTY_FILL_LEVEL
 import indi.muxin.food_talks.common.block.BottleBlockEntity.AddItemResult.*
 import indi.muxin.food_talks.common.item.Cocktail
-import indi.muxin.food_talks.common.item.Cocktail.mergeMobEffectInstance
+import indi.muxin.food_talks.common.mob_effect.merge
 import indi.muxin.food_talks.toRegistryName
 import indi.muxin.food_talks.toResourceLocation
 import indi.muxin.neoforged.registry.FRegistry
@@ -58,6 +58,8 @@ import java.util.Optional
 import kotlin.collections.forEach
 import kotlin.jvm.optionals.getOrNull
 
+
+
 class BottleBlockEntity(
     pos: BlockPos,
     state: BlockState
@@ -73,19 +75,13 @@ class BottleBlockEntity(
     val contents: Map<Holder<MobEffect>, MobEffectInstance>
         field = mutableMapOf()
 
-    fun addPotion(effects: Iterable<MobEffectInstance>): Int {
+    fun addPotion(effects: Sequence<MobEffectInstance>): Boolean {
         val added = effects
             .map { it.effect to it }
-            .map { (effect, instance) ->
-                effect to mergeMobEffectInstance(
-                    MobEffectInstance(effect, instance.duration / 8, instance.amplifier),
-                    contents[effect]
-                )
+            .map { (effect, detail) ->
+                contents[effect] = (detail merge contents[effect])
             }
-            .map { (effect, instance) ->
-                contents[effect] = instance
-            }
-            .count()
+            .any()
         setChanged()
         return added
     }
@@ -142,10 +138,9 @@ class BottleBlockEntity(
             }
 
             stack.`is`(Items.OMINOUS_BOTTLE) -> {
-                ++ freeWaterLevel
-                addPotion(arrayListOf(MobEffectInstance(
+                addPotion(sequenceOf(MobEffectInstance(
                     MobEffects.BAD_OMEN,
-                    100 * 60 * 60 * FoodTalks.TPS,
+                    FoodTalks.TPS,
                     stack.components[DataComponents.OMINOUS_BOTTLE_AMPLIFIER] ?: 0
                 )))
                 if (!player.hasInfiniteMaterials())
@@ -154,9 +149,8 @@ class BottleBlockEntity(
             }
 
             else -> {
-                ++ freeWaterLevel
                 val effects = stack.components[DataComponents.POTION_CONTENTS] ?: PotionContents.EMPTY
-                if (addPotion(effects.allEffects) == 0)
+                if (addPotion(effects.allEffects.asSequence()))
                     ++ freeWaterLevel
 
                 if (!player.hasInfiniteMaterials()){
@@ -199,11 +193,11 @@ class BottleBlockEntity(
     override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
         super.saveAdditional(tag, registries)
         val contentTag = ListTag().apply {
-            contents.asIterable()
+            contents.values.asSequence()
                 .map {
                     MobEffectInstance.CODEC.encodeStart(
                         registries.createSerializationContext(NbtOps.INSTANCE),
-                        it.value
+                        it
                     ).getOrThrow()
                 }
                 .forEach(::add)

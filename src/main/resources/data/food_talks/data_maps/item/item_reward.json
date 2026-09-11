@@ -183,7 +183,7 @@
       "amplifierUnit": 0
     },
     "minecraft:pumpkin_pie": {
-      "effect": "food_talks:scape_goat",
+      "effect": "food_talks:scapegoat",
       "durationBase": 50,
       "durationUnit": 50,
       "amplifierBase": 0,
