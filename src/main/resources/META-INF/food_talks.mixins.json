@@ -10,8 +10,7 @@
 
     "mechanic.FoodDataMixin",
     "mechanic.LivingEntityMixin",
-    "mechanic.MobEffectInstanceAccessor",
-    "mechanic.PathfinderMobMixin"
+    "mechanic.MobEffectInstanceAccessor"
   ],
   "client": [
   ],

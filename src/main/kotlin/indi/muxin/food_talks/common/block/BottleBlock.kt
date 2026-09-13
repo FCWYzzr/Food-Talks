@@ -81,9 +81,9 @@ class BottleBlockEntity(
             .map { (effect, detail) ->
                 contents[effect] = (detail merge contents[effect])
             }
-            .any()
+            .count()
         setChanged()
-        return added
+        return added > 0
     }
     enum class AddItemResult {SUCCESS, SUCCESS_NO_GROW, FAIL}
     fun addItem(state: BlockState, stack: ItemStack, player: Player, hand: InteractionHand): AddItemResult {
@@ -121,15 +121,23 @@ class BottleBlockEntity(
                     SUCCESS
                 }
             }
+            stack.`is`(Items.GLOWSTONE_DUST) -> {
+                if (freeWaterLevel < 2)
+                    FAIL
+                else{
+                    ++ upgrade
+                    freeWaterLevel -= 2
+                    if (!player.hasInfiniteMaterials())
+                        stack.shrink(1)
+                    SUCCESS_NO_GROW
+                }
+            }
 
-            stack.`is`(Items.GLOWSTONE_DUST) || stack.`is`(Items.REDSTONE) -> {
+            stack.`is`(Items.REDSTONE) -> {
                 if (freeWaterLevel < 1)
                     FAIL
                 else{
-                    if (stack.`is`(Items.GLOWSTONE_DUST))
-                        ++ upgrade
-                    else
-                        ++ extend
+                    ++ extend
                     -- freeWaterLevel
                     if (!player.hasInfiniteMaterials())
                         stack.shrink(1)

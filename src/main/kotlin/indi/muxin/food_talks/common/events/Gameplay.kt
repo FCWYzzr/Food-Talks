@@ -3,15 +3,7 @@ package indi.muxin.food_talks.common.events
 import com.google.common.math.IntMath.pow
 import indi.muxin.food_talks.FoodTalks
 import indi.muxin.food_talks.common.item.CompoundFood
-import indi.muxin.food_talks.common.mob_effect.EndlessTreasure
-import indi.muxin.food_talks.common.mob_effect.Treasure
-import indi.muxin.food_talks.common.mob_effect.Scapegoat
-import indi.muxin.food_talks.common.mob_effect.PoisonResistance
-import indi.muxin.food_talks.common.mob_effect.Smelly
-import indi.muxin.food_talks.common.mob_effect.Starving
-import indi.muxin.food_talks.common.mob_effect.Anorexia
-import indi.muxin.food_talks.common.mob_effect.Toothache
-import indi.muxin.food_talks.common.mob_effect.Vomit
+import indi.muxin.food_talks.common.mob_effect.*
 import indi.muxin.food_talks.common.registries.ToothacheDamage
 import indi.muxin.food_talks.common.registries.from
 import indi.muxin.food_talks.common.registries.milkIrremovable
@@ -21,6 +13,7 @@ import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
@@ -30,10 +23,7 @@ import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.ICancellableEvent
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent
-import net.neoforged.neoforge.event.entity.living.LivingDropsEvent
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent
+import net.neoforged.neoforge.event.entity.living.*
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Tick
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent.Applicable
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent.Remove
@@ -275,6 +265,16 @@ object Gameplay {
         val newTarget = event.newAboutToBeSetTarget ?: return
         if (!newTarget.hasEffect(Smelly.holder))
             return
+        event.isCanceled = true
+    }
+    @SubscribeEvent
+    fun tryToAttackSmelly(event: LivingIncomingDamageEvent){
+        if (event.entity.level().isClientSide)
+            return
+        if (!event.entity.hasEffect(Smelly.holder))
+            return
+        val attacker = event.source.entity as? PathfinderMob ?: return
+        attacker.target = null
         event.isCanceled = true
     }
 

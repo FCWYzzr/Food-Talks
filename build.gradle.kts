@@ -17,8 +17,6 @@ val parchmentMinecraftVersion   get() = project.findProperty("parchment_minecraf
 val kffVersion                  get() = project.findProperty("kff_version                   ".trim()) as String
 val jeiVersion                  get() = project.findProperty("jei_version                   ".trim()) as String
 val ponderVersion               get() = project.findProperty("ponder_version                ".trim()) as String
-val flywheelVersion               get() = project.findProperty("flywheel_version                ".trim()) as String
-
 
 plugins {
     id("java-library")
@@ -182,8 +180,6 @@ tasks.withType<ProcessResources>().configureEach {
             "minecraft_version_range" to minecraftVersionRange,
             "kff_version_range" to "[${kffVersion},)",
             "jei_version_range" to "[${jeiVersion},)",
-            "flywheel_version_range" to "[${flywheelVersion},)",
-            "ponder_version_range" to "[${ponderVersion},)",
             "neo_version" to neoVersion,
             "neo_version_range" to neoVersionRange,
             "loader_version_range" to loaderVersionRange,

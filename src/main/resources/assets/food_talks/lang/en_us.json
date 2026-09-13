@@ -35,7 +35,7 @@
   "food_talks.ponder.scene.cocktail_assembly.text_1": "Glass bottle now can be placed in the world.",
   "food_talks.ponder.scene.cocktail_assembly.text_2": "You can pour potions into it (max 8). Each water bottle grants 1 extra 'free water level'",
   "food_talks.ponder.scene.cocktail_assembly.text_3": "Redstone cost 1 free water level to extend effect duration by 1",
-  "food_talks.ponder.scene.cocktail_assembly.text_4": "Glow stone dust cost 1 free water level to upgrade effect level by 1",
+  "food_talks.ponder.scene.cocktail_assembly.text_4": "Glow stone dust cost 2 free water level to upgrade effect level by 1",
   "food_talks.ponder.scene.cocktail_assembly.text_5": "Honey bottle cost 2 free water level to remove all negative effects",
   "food_talks.ponder.scene.cocktail_assembly.text_6": "Sneak click or break it to get your cocktail.",
 

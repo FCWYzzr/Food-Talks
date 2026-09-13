@@ -45,17 +45,3 @@ config="META-INF/${mod_id}.mixins.json"
     versionRange="${jei_version_range}"
     ordering="AFTER"
     side="BOTH"
-
-[[dependencies.${mod_id}]]
-    modId="flywheel"
-    type="optional"
-    versionRange="${flywheel_version_range}"
-    ordering="AFTER"
-    side="BOTH"
-
-[[dependencies.${mod_id}]]
-    modId="ponder"
-    type="optional"
-    versionRange="${ponder_version_range}"
-    ordering="AFTER"
-    side="CLIENT"

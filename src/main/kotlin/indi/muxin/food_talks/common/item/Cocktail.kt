@@ -34,7 +34,7 @@ object Cocktail: CompoundFood(
     /**
      * final duration = base duration * (1 + extend / 3)
      */
-    fun buildFromBottle(entity: BottleBlockEntity, fillLevel: Int): ItemStack{
+    fun buildFromBottle(entity: BottleBlockEntity, fillLevel: Int): ItemStack {
         if (fillLevel == 0)
             return Items.GLASS_BOTTLE.defaultInstance
 
