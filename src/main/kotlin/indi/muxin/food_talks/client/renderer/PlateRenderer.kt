@@ -2,11 +2,13 @@ package indi.muxin.food_talks.client.renderer
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
+import indi.muxin.food_talks.common.block.PlateBlock
 import indi.muxin.food_talks.common.block.PlateBlockEntity
 import indi.muxin.food_talks.common.item.Sandwich
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
+import net.minecraft.core.Direction
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 
@@ -19,6 +21,24 @@ object PlateRenderer: BlockEntityRenderer<PlateBlockEntity> {
         buffer: MultiBufferSource,
         combinedLight: Int,
         combinedOverlay: Int) {
+        poseStack.pushPose()
+        when (entity.blockState.getValue(PlateBlock.PROPERTY_DIRECTION)){
+            Direction.SOUTH ->
+                poseStack.mulPose(Axis.YP.rotationDegrees(0F))
+            Direction.EAST -> {
+                poseStack.mulPose(Axis.YP.rotationDegrees(90F))
+                poseStack.translate(-1f, 0f, 0f)
+            }
+            Direction.NORTH -> {
+                poseStack.mulPose(Axis.YP.rotationDegrees(180F))
+                poseStack.translate(-1f, 0f, -1f)
+            }
+            Direction.WEST -> {
+                poseStack.mulPose(Axis.YP.rotationDegrees(270F))
+                poseStack.translate(0f, 0f, -1f)
+            }
+            Direction.DOWN, Direction.UP -> {}
+        }
 
         if (entity.ingredients.isNotEmpty() || entity.displayItem.`is`(Sandwich))
             SandwichRenderer.renderSandwich(
@@ -29,8 +49,7 @@ object PlateRenderer: BlockEntityRenderer<PlateBlockEntity> {
                 poseStack,
                 buffer,
                 combinedLight,
-                combinedOverlay,
-                false
+                combinedOverlay
             )
         else {
             poseStack.pushPose()
@@ -49,6 +68,8 @@ object PlateRenderer: BlockEntityRenderer<PlateBlockEntity> {
             )
             poseStack.popPose()
         }
+
+        poseStack.popPose()
     }
 
 

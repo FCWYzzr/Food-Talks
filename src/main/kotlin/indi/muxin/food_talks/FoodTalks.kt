@@ -13,12 +13,10 @@ import org.slf4j.Logger
 
 @Mod(FoodTalks.MOD_ID)
 object FoodTalks {
-
     const val MOD_ID = "food_talks"
     const val TPS = 20
 
     val logger: Logger = LogUtils.getLogger()
-
     val random: RandomSource = RandomSource.create()
 
     init {
@@ -28,25 +26,23 @@ object FoodTalks {
 
 @JeiPlugin
 class JustEnoughFoodTalks: IModPlugin {
-    override fun getPluginUid() = "jei".toResourceLocation()
+    override fun getPluginUid() = "Jei".toResourceLocation()
 }
 
-
-fun String.toRegistryName() = buildString{
-    val text = this@toRegistryName
-    append(text[0].lowercaseChar())
-    for (i in 1..<text.length)
-        if (text[i].isLowerCase())
-            append(text[i])
-        else{
-            append('_')
-            append(text[i].lowercaseChar())
-        }
-}
-
-fun String.toResourceLocation(): ResourceLocation =
+fun String.toResourceLocation(namespace: String=FoodTalks.MOD_ID): ResourceLocation =
     ResourceLocation
-        .fromNamespaceAndPath(FoodTalks.MOD_ID, this)
+        .fromNamespaceAndPath(namespace, buildString{
+            val text = this@toResourceLocation
+            append(text[0].lowercaseChar())
+            for (i in 1..<text.length)
+                if (text[i].isUpperCase()) {
+                    append('_')
+                    append(text[i].lowercaseChar())
+                } else
+                    append(text[i])
+        })
+
+
 
 fun <T> ResourceLocation.toResourceKeyOf(registry: ResourceKey<Registry<T>>): ResourceKey<T> =
     ResourceKey.create(registry, this)

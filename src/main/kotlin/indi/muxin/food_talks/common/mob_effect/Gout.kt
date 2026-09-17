@@ -1,11 +1,11 @@
 package indi.muxin.food_talks.common.mob_effect
 
 import indi.muxin.food_talks.FoodTalks
-import indi.muxin.neoforged.registry.FMobEffect
 import indi.muxin.food_talks.common.registries.GoutDamage
 import indi.muxin.food_talks.common.registries.from
 import net.minecraft.util.Mth
 import net.minecraft.world.Difficulty
+import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
@@ -15,13 +15,10 @@ import net.minecraft.world.entity.player.Player
  *
  * every 20 tick, player has 1/5 chance to receive 2 damage, effected by difficulty
  */
-object Gout: FMobEffect(MobEffectCategory.HARMFUL, 0x801400) {
+object Gout: MobEffect(MobEffectCategory.HARMFUL, 0x801400) {
 
     override fun shouldApplyEffectTickThisTick(duration: Int, amplifier: Int): Boolean {
-        if (duration % 20 != 0)
-            return false
-
-        return Mth.randomBetween(FoodTalks.random, 0F, 5F) < 1
+        return duration % 20 == 0 && Mth.randomBetween(FoodTalks.random, 0F, 5F) < 1
     }
 
     override fun applyEffectTick(livingEntity: LivingEntity, amplifier: Int): Boolean {

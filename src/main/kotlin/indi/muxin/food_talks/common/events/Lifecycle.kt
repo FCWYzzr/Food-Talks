@@ -1,29 +1,22 @@
 package indi.muxin.food_talks.common.events
 
-import indi.muxin.food_talks.FoodTalks
 import indi.muxin.food_talks.FoodTalks.MOD_ID
-import indi.muxin.food_talks.common.block.BottleBlock
-import indi.muxin.food_talks.common.block.BottleBlockEntity
-import indi.muxin.food_talks.common.block.PlateBlock
-import indi.muxin.food_talks.common.block.PlateBlockEntity
-import indi.muxin.food_talks.common.data_components.registerFoodItemProperties
-import indi.muxin.food_talks.common.data_components.registerFoodStackProperties
-import indi.muxin.food_talks.common.data_components.registerSimpleDataComponents
-import indi.muxin.food_talks.common.item.Cocktail
-import indi.muxin.food_talks.common.item.Plate
-import indi.muxin.food_talks.common.item.Sandwich
-import indi.muxin.food_talks.common.mob_effect.*
+import indi.muxin.food_talks.common.block.registerFTBlocksAndEntities
+import indi.muxin.food_talks.common.data_components.registerFTDataComponents
+import indi.muxin.food_talks.common.item.FTItems
+import indi.muxin.food_talks.common.item.registerFTItems
+import indi.muxin.food_talks.common.mob_effect.FTPotionHolders
+import indi.muxin.food_talks.common.mob_effect.registerFTMobEffects
 import indi.muxin.food_talks.common.registries.FoodItemReward
 import indi.muxin.food_talks.common.registries.FoodTagPunishment
 import indi.muxin.food_talks.toResourceLocation
-import net.minecraft.core.registries.BuiltInRegistries
+import indi.muxin.neoforged.utils.buildItemStack
+import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
-import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.item.CreativeModeTab
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import net.minecraft.world.item.alchemy.Potion
+import net.minecraft.world.item.alchemy.PotionContents
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -42,57 +35,38 @@ object Lifecycle {
     }
 
     @SubscribeEvent
-    fun registerComponents(event: RegisterEvent){
-        event.register(BuiltInRegistries.DATA_COMPONENT_TYPE.key()){
-            it.registerFoodItemProperties()
-            it.registerFoodStackProperties()
-            it.registerSimpleDataComponents()
-        }
-    }
+    fun registerElements(event: RegisterEvent){
+        registerFTDataComponents(event)
+        registerFTMobEffects(event)
+        registerFTBlocksAndEntities(event)
+        registerFTItems(event)
 
-    @SubscribeEvent
-    fun registerEffectAndPotions(event: RegisterEvent){
-        for (it in arrayOf(Anorexia,
-                Gout,
-                Toothache,
-                Vomit,
-                Overweight,
-                PoisonResistance,
-                DarknessInfused,
-                Treasure,
-                EndlessTreasure,
-                Smelly,
-                Happy,
-                ProjectileImmune,
-                Starving,
-                Scapegoat)) {
-            it registerTo event
-            event.register(Registries.POTION) { rh ->
-                rh.register(it.location,
-                    Potion(MobEffectInstance(it.holder, 30 * FoodTalks.TPS)))
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun registerItemBlocksAndTab(event: RegisterEvent){
-        BottleBlock registerTo event
-        PlateBlock  registerTo event
-
-        BottleBlockEntity registerTo event
-        PlateBlockEntity  registerTo event
-
-        Cocktail    registerTo event
-        Plate       registerTo event
-        Sandwich    registerTo event
 
         event.register(Registries.CREATIVE_MODE_TAB){
             it.register("creative_tab".toResourceLocation(), CreativeModeTab.builder()
-                .icon { ItemStack(Plate) }
+                .icon { FTItems.PLATE.defaultInstance }
                 .title(Component.translatable("itemGroup.${MOD_ID}.ft_tab")) // 设置名称
                 .displayItems { _, output ->
-                    output.accept(Plate)
-                    output.accept(Items.GLASS_BOTTLE.defaultInstance)
+                    output.accept(FTItems.PLATE.defaultInstance)
+                    output.accept(FTItems.GLASS_BOTTLE.defaultInstance)
+                    output.accept(FTItems.BOWL.defaultInstance)
+                    for (potion in arrayOf(FTPotionHolders.HAPPY,
+                                            FTPotionHolders.DARKNESS_INFUSED,
+                                            FTPotionHolders.POISON_RESISTANCE,
+                                            FTPotionHolders.TREASURE,
+                                            FTPotionHolders.ENDLESS_TREASURE,
+                                            FTPotionHolders.SMELLY,
+                                            FTPotionHolders.PROJECTILE_IMMUNE,
+                                            FTPotionHolders.STARVING,
+                                            FTPotionHolders.SCAPEGOAT,
+                                            FTPotionHolders.ANOREXIA,
+                                            FTPotionHolders.GOUT,
+                                            FTPotionHolders.VOMIT,
+                                            FTPotionHolders.TOOTHACHE,
+                                            FTPotionHolders.OVERWEIGHT))
+                        output.accept(buildItemStack(Items.POTION){ itemStack ->
+                            itemStack[DataComponents.POTION_CONTENTS] = PotionContents(potion)
+                        })
                 }
                 .build())
         }

@@ -1,6 +1,7 @@
 {
   "block.food_talks.bottle_block": "Glass Bottle",
-  "block.food_talks.plate": "Wooden Plate",
+  "block.food_talks.plate_block": "Wooden Plate",
+  "block.food_talks.bowl_block": "Wooden Bowl",
   "item.food_talks.cocktail": "Cocktail",
   "item.food_talks.sandwich": "Sandwich",
 
@@ -38,6 +39,12 @@
   "food_talks.ponder.scene.cocktail_assembly.text_4": "Glow stone dust cost 2 free water level to upgrade effect level by 1",
   "food_talks.ponder.scene.cocktail_assembly.text_5": "Honey bottle cost 2 free water level to remove all negative effects",
   "food_talks.ponder.scene.cocktail_assembly.text_6": "Sneak click or break it to get your cocktail.",
+
+  "food_talks.ponder.scene.bread_tipping.header": "Tipping Bread",
+  "food_talks.ponder.scene.bread_tipping.text_1": "If you or your food-eating machinery prefer vanilla food, you might want a better bread.",
+  "food_talks.ponder.scene.bread_tipping.text_2": "You may put any soup, potion, ominous bottle, honey bottle or sugar into it.\nIt stores soup's nut & sat, potion's effect.Moreover, honey grants you free from poison. And sugar simply gives you more sat.",
+  "food_talks.ponder.scene.bread_tipping.text_3": "Click it to take a sip...",
+  "food_talks.ponder.scene.bread_tipping.text_4": "or tip a bread to get an enhanced bread!",
 
   "death.attack.toothache": "%1$s 's teeth was shattered into pieces.",
   "death.attack.gout": "%1$s 's joint explodes.",

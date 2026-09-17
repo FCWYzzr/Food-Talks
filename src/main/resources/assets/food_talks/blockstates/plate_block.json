@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "food_talks:block/plate_block"
+    },
+    "facing=west": {
+      "model": "food_talks:block/plate_block"
+    },
+    "facing=south": {
+      "model": "food_talks:block/plate_block"
+    },
+    "facing=east": {
+      "model": "food_talks:block/plate_block"
+    }
+  }
+}

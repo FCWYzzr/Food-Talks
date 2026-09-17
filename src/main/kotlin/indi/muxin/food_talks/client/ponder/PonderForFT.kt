@@ -11,5 +11,6 @@ object PonderForFT: PonderPlugin {
     override fun registerScenes(helper: PonderSceneRegistrationHelper<ResourceLocation>) {
         sandwichCookbook(helper)
         cocktailCookbook(helper)
+        tippedBreadCookbook(helper)
     }
 }

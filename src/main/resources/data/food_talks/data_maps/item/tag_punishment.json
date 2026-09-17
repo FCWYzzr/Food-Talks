@@ -1,12 +1,5 @@
 {
   "values": {
-    "#food_talks:food_category/drinks": {
-      "effect": "minecraft:nausea",
-      "durationBase": 600,
-      "durationUnit": 100,
-      "amplifierBase": 0,
-      "amplifierUnit": 0
-    },
     "#food_talks:food_category/drugs": {
       "effect": "minecraft:poison",
       "durationBase": 600,

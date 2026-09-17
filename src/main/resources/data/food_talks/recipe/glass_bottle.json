@@ -7,11 +7,11 @@
   ],
   "key": {
     "S": {
-      "tag": "minecraft:wooden_slabs"
+      "tag": "c:glass_panes"
     }
   },
   "result": {
-    "id": "food_talks:bowl",
+    "id": "food_talks:glass_bottle",
     "count": 1
   }
 }

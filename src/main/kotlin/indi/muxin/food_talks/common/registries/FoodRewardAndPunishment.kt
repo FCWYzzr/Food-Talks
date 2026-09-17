@@ -2,13 +2,12 @@ package indi.muxin.food_talks.common.registries
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import indi.muxin.food_talks.toRegistryName
+import indi.muxin.food_talks.common.mob_effect.MobEffectDetail
 import indi.muxin.food_talks.toResourceLocation
 import indi.muxin.neoforged.utils.buildDataMapType
 import net.minecraft.core.Holder
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.effect.MobEffect
-import net.minecraft.world.effect.MobEffectInstance
 import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent
 
 data class EffectFormula(
@@ -18,7 +17,7 @@ data class EffectFormula(
     val amplifierBase: Int,
     val amplifierUnit: Int) {
     fun calculate(level: Int) =
-        MobEffectInstance(effect, durationBase + durationUnit * level, amplifierBase + amplifierUnit * level)
+        MobEffectDetail(durationBase + durationUnit * level, amplifierBase + amplifierUnit * level)
 
     companion object {
         val codec: Codec<EffectFormula> = RecordCodecBuilder.create{
@@ -36,7 +35,7 @@ data class EffectFormula(
 object FoodItemReward{
     val type = buildDataMapType(
         Registries.ITEM,
-        "ItemReward".toRegistryName().toResourceLocation(),
+        "ItemReward".toResourceLocation(),
         EffectFormula.codec
     )
 
@@ -48,7 +47,7 @@ object FoodItemReward{
 object FoodTagPunishment{
     val type = buildDataMapType(
         Registries.ITEM,
-        "TagPunishment".toRegistryName().toResourceLocation(),
+        "TagPunishment".toResourceLocation(),
         EffectFormula.codec
     )
 

@@ -9,19 +9,24 @@ import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.item.Item
 
 
-fun ResourceLocation.toItemTag(): TagKey<Item> = ItemTags.create(this)
-fun ResourceLocation.toMobEffectTag(): TagKey<MobEffect> = TagKey.create(
-    Registries.MOB_EFFECT, this
-)
 
-val sandwichCover = "ingredient/sandwich_cover"
-    .toResourceLocation()
-    .toItemTag()
 
-val milkIrremovable = "milk_irremovable"
-    .toResourceLocation()
-    .toMobEffectTag()
+object FTTags {
+    private fun ResourceLocation.toItemTag(): TagKey<Item> = ItemTags.create(this)
+    private fun ResourceLocation.toMobEffectTag(): TagKey<MobEffect> = TagKey.create(
+        Registries.MOB_EFFECT, this
+    )
 
-val soupFood = "food_category/soup"
-    .toResourceLocation()
-    .toItemTag()
+    @JvmField val SANDWICH_COVER = "ingredient/sandwichCover"
+        .toResourceLocation()
+        .toItemTag()
+
+    @JvmField val MILK_IRREMOVABLE = "milkIrremovable"
+        .toResourceLocation()
+        .toMobEffectTag()
+
+    @JvmField val SOUP = "foods/soup"
+        .toResourceLocation("c")
+        .toItemTag()
+}
+

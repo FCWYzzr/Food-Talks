@@ -8,6 +8,8 @@ import net.minecraft.network.chat.ComponentContents
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.registries.datamaps.DataMapType
 
 fun buildDataComponentPatch(action: DataComponentPatch.Builder.() -> Unit): DataComponentPatch {
@@ -28,3 +30,6 @@ fun buildMutableComponent(content: ComponentContents, actions: MutableComponent.
 
 fun <T, R> buildDataMapType(registryKey: ResourceKey<Registry<R>>, id: ResourceLocation, codec: Codec<T>, actions: DataMapType.Builder<T, R>.() -> Unit={}) =
     DataMapType.builder(id, registryKey, codec).apply(actions).build() as DataMapType<R, T>
+
+
+fun buildItemStack(item: Item, actions: (ItemStack) -> Unit) = ItemStack(item).apply(actions)

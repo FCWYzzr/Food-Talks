@@ -1,8 +1,10 @@
 package indi.muxin.food_talks.client.ponder
 
 import indi.muxin.food_talks.FoodTalks
+import indi.muxin.food_talks.common.block.FTBlocks
 import indi.muxin.food_talks.common.block.PlateBlockEntity
-import indi.muxin.food_talks.common.item.Plate
+import indi.muxin.food_talks.common.item.FTItemHolders
+import indi.muxin.food_talks.common.item.FTItems
 import indi.muxin.food_talks.common.item.Sandwich
 import net.createmod.catnip.math.Pointing
 import net.createmod.ponder.api.registration.MultiSceneBuilder
@@ -15,15 +17,27 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.phys.Vec3
 
-fun sandwichCookbook(ps: PonderSceneRegistrationHelper<ResourceLocation>): MultiSceneBuilder = ps.forComponents(Plate.location)
-    .addStoryBoard("plate/sandwich_assembly"){ scene, util ->
+fun sandwichCookbook(ps: PonderSceneRegistrationHelper<ResourceLocation>): MultiSceneBuilder = ps.forComponents(
+    FTItemHolders.PLATE.key!!.location())
+    .addStoryBoard("kitchen_scene"){ scene, util ->
         scene.title("scene.sandwich_assembly", "Sandwich Assembly")
-        scene.configureBasePlate(0, 0, 2)
+        scene.configureBasePlate(0, 0, 3)
         scene.world().showSection(util.select().everywhere(), Direction.UP)
 
         scene.overlay().showText(2 * FoodTalks.TPS)
             .text("1")
-        scene.idle(2 * FoodTalks.TPS + 5)
+        scene.idle(5)
+
+        scene.overlay().showControls(
+            Vec3(1.5, 3.0, 1.5),
+            Pointing.DOWN,
+            5)
+            .rightClick()
+            .withItem(FTItems.PLATE.defaultInstance)
+        scene.world().setBlock(
+            BlockPos(1, 2, 1),
+            FTBlocks.PLATE_BLOCK.defaultBlockState(), true)
+        scene.idle(FoodTalks.TPS * 2)
 
         val putItem = {item: ItemStack, duration: Int ->
             scene.overlay().showControls(
@@ -80,7 +94,7 @@ fun sandwichCookbook(ps: PonderSceneRegistrationHelper<ResourceLocation>): Multi
                 Items.BAKED_POTATO.defaultInstance,
                 Items.CARROT.defaultInstance,
                 Items.BREAD.defaultInstance
-            ))
+            )).last()
         )
         scene.idleSeconds(3)
 

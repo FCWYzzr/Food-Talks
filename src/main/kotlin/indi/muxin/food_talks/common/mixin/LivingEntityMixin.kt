@@ -1,7 +1,6 @@
-package indi.muxin.food_talks.common.mixin.mechanic
+package indi.muxin.food_talks.common.mixin
 
-import indi.muxin.food_talks.common.mob_effect.ProjectileImmune
-import indi.muxin.food_talks.common.mob_effect.Overweight
+import indi.muxin.food_talks.common.mob_effect.FTMobEffectHolders
 import net.minecraft.core.Holder
 import net.minecraft.util.RandomSource
 import net.minecraft.world.effect.MobEffect
@@ -23,19 +22,20 @@ abstract class LivingEntityMixin(entityType: EntityType<*>, level: Level) : Enti
     abstract fun hasEffect(effect: Holder<MobEffect>): Boolean
 
     override fun deflection(projectile: Projectile): ProjectileDeflection {
-        if (hasEffect(ProjectileImmune.holder))
+        if (hasEffect(FTMobEffectHolders.PROJECTILE_IMMUNE))
             return ProjectileDeflection { arrow: Projectile, _: Entity?, _: RandomSource ->
-                val v = arrow.deltaMovement
-                arrow.setDeltaMovement(-v.x / 2, 0.0, -v.z / 2)
+                arrow.setDeltaMovement(0.0, 0.0, 0.0)
             }
         return super.deflection(projectile)
     }
 
     @Inject(method = ["setSprinting"], at = [At("HEAD")], cancellable = true)
     fun setSprintingMixin(sprinting: Boolean, ci: CallbackInfo) {
+        if (!sprinting)
+            return
         @Suppress("CAST_NEVER_SUCCEEDS")
         val self = this as LivingEntity
-        if (!self.hasEffect(Overweight.holder))
+        if (!self.hasEffect(FTMobEffectHolders.OVERWEIGHT))
             return
         if (sprinting)
             ci.cancel()

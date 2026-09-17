@@ -4,10 +4,10 @@
     "type": "neoforge:true"
   }],
   "ingredients": [
-    {"item": "minecraft:bowl"}
+    {"item": "food_talks:plate"}
   ],
   "result": {
-    "id": "food_talks:plate",
+    "id": "food_talks:bowl",
     "count": 1
   }
 }

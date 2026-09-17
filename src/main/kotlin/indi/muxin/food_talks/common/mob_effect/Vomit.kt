@@ -1,6 +1,5 @@
 package indi.muxin.food_talks.common.mob_effect
 
-import indi.muxin.neoforged.registry.FMobEffect
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.core.BlockPos
@@ -8,6 +7,7 @@ import net.minecraft.core.particles.BlockParticleOption
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.util.Mth
 import net.minecraft.world.Difficulty
+import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
@@ -32,7 +32,7 @@ import kotlin.math.min
  *
  * after vomit, player will be slow, dizzy & unable to eat for 10s
  */
-object Vomit : FMobEffect(
+object Vomit : MobEffect(
     MobEffectCategory.HARMFUL,
     0x00592f
 ){
@@ -68,15 +68,15 @@ private fun reduceFoodLevel(player: Player): Boolean {
     }
     player.foodData.setSaturation(0F)
     player.addEffect(MobEffectInstance(
-        MobEffects.CONFUSION, 10, 1, false, true, false
+        MobEffects.CONFUSION, 20, 1, false, false, false
     ))
 
     player.addEffect(MobEffectInstance(
-        MobEffects.MOVEMENT_SLOWDOWN, 10, 1, false, true, false
+        MobEffects.MOVEMENT_SLOWDOWN, 10, 1, false, false, false
     ))
 
     player.addEffect(MobEffectInstance(
-        Anorexia.holder, 10, 1, false, true, false
+        FTMobEffectHolders.ANOREXIA, 20, 0, false, false, false
     ))
 
     return false

@@ -1,6 +1,7 @@
 {
   "block.food_talks.bottle_block": "玻璃瓶",
   "block.food_talks.plate": "木盘",
+  "block.food_talks.bowl_block": "木碗",
   "item.food_talks.cocktail": "鸡尾酒",
   "item.food_talks.sandwich": "三明治",
 
@@ -43,6 +44,11 @@
   "food_talks.ponder.scene.cocktail_assembly.text_5": "加入蜂蜜可以花费两个自由水位去除鸡尾酒所有负面效果。",
   "food_talks.ponder.scene.cocktail_assembly.text_6": "潜行右键或打碎瓶子可以获取调配好的鸡尾酒。",
 
+  "food_talks.ponder.scene.bread_tipping.header": "蘸汤的面包",
+  "food_talks.ponder.scene.bread_tipping.text_1": "如果你或者吃人饭的机器更喜欢原版食物，那么你可能会想要一个更好的面包.",
+  "food_talks.ponder.scene.bread_tipping.text_2": "你可以往碗里倒任何的汤、药水、蜂蜜、不详之瓶或糖.\n碗里的汤会保留所有成分的饱食度和饱和度以及药水的效果。蜂蜜可以提供毒免，同时糖可以提升饱和度.",
+  "food_talks.ponder.scene.bread_tipping.text_3": "直接点击碗就可以喝一口……",
+  "food_talks.ponder.scene.bread_tipping.text_4": "或者使用面包点击来蘸取所有特性！",
 
   "item.minecraft.potion.effect.poison_resistance":  "毒抗药水",
   "item.minecraft.potion.effect.darkness_infused":   "黑化药水",

@@ -2,7 +2,7 @@ package indi.muxin.food_talks.client.renderer
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
-import indi.muxin.food_talks.common.registries.sandwichCover
+import indi.muxin.food_talks.common.registries.FTTags
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.core.Holder
@@ -19,11 +19,9 @@ object SandwichRenderer {
         poseStack: PoseStack,
         buffer: MultiBufferSource,
         light: Int,
-        overlay: Int,
-        notOnFrame: Boolean
+        overlay: Int
     ){
         renderLayers(
-            if (notOnFrame) ITEM_FRAME_HEIGHT else ITEM_FRAME_HEIGHT,
             layer,
             poseStack,
             buffer,
@@ -32,7 +30,6 @@ object SandwichRenderer {
     }
 
     private fun renderLayers(
-        startOffset: Double,
         layer: List<Holder<Item>>,
         poseStack: PoseStack,
         buffer: MultiBufferSource,
@@ -43,7 +40,7 @@ object SandwichRenderer {
             return
 
         poseStack.pushPose()
-        poseStack.translate(0.5, startOffset, 0.5)
+        poseStack.translate(0.5, ITEM_FRAME_HEIGHT, 0.5)
 
         val layerItem = layer
             .map(Holder<Item>::value)
@@ -70,7 +67,7 @@ object SandwichRenderer {
             renderSingleLayer(
                 LAYER_HEIGHT * (layerItem.size - 1.0),
                 layerItem.last(),
-                layerItem.last().`is`(sandwichCover),
+                layerItem.last().`is`(FTTags.SANDWICH_COVER),
                 poseStack, buffer, light, overlay)
         poseStack.popPose()
     }

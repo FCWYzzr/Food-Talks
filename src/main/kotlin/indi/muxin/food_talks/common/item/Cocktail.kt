@@ -18,10 +18,9 @@ import java.util.*
 object Cocktail: CompoundFood(
     0.25F,
     1,
-    Items.GLASS_BOTTLE.defaultInstance,
+    FTItems.GLASS_BOTTLE.defaultInstance,
     true
 ) {
-
     override fun getUseAnimation(stack: ItemStack) = UseAnim.DRINK
 
     override fun uponBite(itemStack: ItemStack, entity: LivingEntity): Boolean {

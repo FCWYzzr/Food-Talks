@@ -3,17 +3,16 @@ package indi.muxin.food_talks.common.events
 import com.google.common.math.IntMath.pow
 import indi.muxin.food_talks.FoodTalks
 import indi.muxin.food_talks.common.item.CompoundFood
-import indi.muxin.food_talks.common.mob_effect.*
+import indi.muxin.food_talks.common.mob_effect.FTMobEffectHolders
+import indi.muxin.food_talks.common.registries.FTTags
 import indi.muxin.food_talks.common.registries.ToothacheDamage
 import indi.muxin.food_talks.common.registries.from
-import indi.muxin.food_talks.common.registries.milkIrremovable
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.Mth
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.PathfinderMob
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
@@ -24,9 +23,6 @@ import net.neoforged.bus.api.ICancellableEvent
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.event.entity.living.*
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent.Tick
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent.Applicable
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent.Remove
 import net.neoforged.neoforge.event.level.BlockDropsEvent
 import net.neoforged.neoforge.event.level.BlockEvent
 import net.neoforged.neoforge.event.level.BlockEvent.BreakEvent
@@ -39,22 +35,21 @@ import kotlin.math.min
 )
 object Gameplay {
     @SubscribeEvent
-    fun tickEating(tick: Tick){
+    fun tickEating(tick: LivingEntityUseItemEvent.Tick){
         val itemStack = tick.item
         val item = itemStack.item
         if (item !is CompoundFood)
             return
 
-
         val chewTick = item.chewTick(itemStack)
         if (tick.duration != 1)
             return
 
-
         val entity = tick.entity
         if (itemStack.damageValue < itemStack.maxDamage
             && item.uponBite(itemStack, entity)
-            && Anorexia.canEat(itemStack, entity))
+            && !entity.hasEffect(FTMobEffectHolders.ANOREXIA)
+            && !entity.hasEffect(FTMobEffectHolders.VOMIT))
             tick.duration += chewTick
         else
             tick.isCanceled = true
@@ -64,33 +59,23 @@ object Gameplay {
     }
 
     @SubscribeEvent
-    fun entityTryToRemoveEffect(event: Remove){
+    fun entityTryToRemoveEffect(event: MobEffectEvent.Remove){
         if (event.cure != null)
-            if (event.effect.`is`(milkIrremovable))
+            if (event.effect.`is`(FTTags.MILK_IRREMOVABLE))
                 event.isCanceled = true
     }
 
     @SubscribeEvent
     fun entityTryToEatWhenAnorexiaOrVomit(event: LivingEntityUseItemEvent){
-        if (!event.entity.hasEffect(Anorexia.holder)
-            && !event.entity.hasEffect(Vomit.holder))
+        if (!event.entity.hasEffect(FTMobEffectHolders.ANOREXIA) || !event.entity.hasEffect(FTMobEffectHolders.VOMIT))
             return
-
-        val holdItem = event.entity.mainHandItem
-
-        if (holdItem.isEmpty)
-            return
-
-        if (holdItem.`is` { !it.isBound })
-            return
-
         if (CompoundFood.isFood(event.item) && event is ICancellableEvent)
             event.isCanceled = true
     }
 
     @SubscribeEvent
-    fun entityEatingWhenToothache(event: Tick){
-        if (!event.entity.hasEffect(Toothache.holder))
+    fun entityEatingWhenToothache(event: LivingEntityUseItemEvent.Tick){
+        if (!event.entity.hasEffect(FTMobEffectHolders.TOOTHACHE))
             return
         if (event.duration % 10 != 0)
             return
@@ -101,7 +86,7 @@ object Gameplay {
     }
 
     @SubscribeEvent
-    fun entityEatingWhenStarving(event: Tick){
+    fun entityEatingWhenStarving(event: LivingEntityUseItemEvent.Tick){
         if (event.duration < 20)
             return
         if (event.duration % 10 != 0)
@@ -110,7 +95,7 @@ object Gameplay {
         if (!CompoundFood.isFood(event.item))
             return
 
-        val starvingLevel = event.entity.getEffect(Starving.holder)
+        val starvingLevel = event.entity.getEffect(FTMobEffectHolders.STARVING)
             ?.amplifier
             ?.plus(1)
             ?: return
@@ -119,20 +104,20 @@ object Gameplay {
     }
 
     @SubscribeEvent
-    fun tryToApplyPoisonToEntity(event: Applicable){
+    fun tryToApplyPoisonToEntity(event: MobEffectEvent.Applicable){
         if (event.effectInstance?.effect?.value() !== MobEffects.POISON.value())
             return
-        if (!event.entity.hasEffect(PoisonResistance.holder))
+        if (!event.entity.hasEffect(FTMobEffectHolders.POISON_RESISTANCE))
             return
 
-        val resistant = event.entity.getEffect(PoisonResistance.holder)!!
+        val resistant = event.entity.getEffect(FTMobEffectHolders.POISON_RESISTANCE)!!
         val poison = event.effectInstance!!
 
         event.result = if (resistant.amplifier >= poison.amplifier)
-            Applicable.Result.DO_NOT_APPLY
+            MobEffectEvent.Applicable.Result.DO_NOT_APPLY
         else {
-            event.entity.removeEffect(PoisonResistance.holder)
-            Applicable.Result.APPLY
+            event.entity.removeEffect(FTMobEffectHolders.POISON_RESISTANCE)
+            MobEffectEvent.Applicable.Result.APPLY
         }
     }
 
@@ -157,7 +142,7 @@ object Gameplay {
         if (event.entity is Player)
             return
 
-        attacker.getEffect(Treasure.holder)
+        attacker.getEffect(FTMobEffectHolders.TREASURE)
             ?.amplifier
             ?.let { treasureLevel ->
                 val multiply = Mth.randomBetween(
@@ -173,7 +158,7 @@ object Gameplay {
                     }
             }
 
-        val reviveRate = (attacker.getEffect(EndlessTreasure.holder)
+        val reviveRate = (attacker.getEffect(FTMobEffectHolders.ENDLESS_TREASURE)
             ?.amplifier ?: return).let { min(max(0F, it / 6.0F), 0.5F) }
 
         if (Mth.randomBetween(FoodTalks.random, 0F, 1F) < reviveRate)
@@ -209,7 +194,7 @@ object Gameplay {
             tool
         )
 
-        val treasureLevel = player.getEffect(Treasure.holder) ?.amplifier ?: return drops
+        val treasureLevel = player.getEffect(FTMobEffectHolders.TREASURE) ?.amplifier ?: return drops
         val multiply = Mth.randomBetween(
             FoodTalks.random,
             treasureLevel * 0.1F + 1F,
@@ -230,7 +215,7 @@ object Gameplay {
             return
 
         val miner = event.player
-        val reviveRate = (miner.getEffect(EndlessTreasure.holder)
+        val reviveRate = (miner.getEffect(FTMobEffectHolders.ENDLESS_TREASURE)
             ?.amplifier ?: return ).let { min(max(0F, it / 6.0F), 0.5F) }
 
 
@@ -246,7 +231,7 @@ object Gameplay {
     fun miningDuringTreasure(event: BlockDropsEvent){
         if (shouldIgnoreMiningEvent(event, event.breaker as? Player? ?: return))
            return
-        if (!(event.breaker as Player).hasEffect(Treasure.holder))
+        if (!(event.breaker as Player).hasEffect(FTMobEffectHolders.TREASURE))
             return
         event.drops.clear()
         calculateTreasureDrop(event, event.breaker as Player, event.level as ServerLevel, (event.breaker as Player).mainHandItem).forEach {
@@ -263,7 +248,7 @@ object Gameplay {
         if (event.entity.level().isClientSide)
             return
         val newTarget = event.newAboutToBeSetTarget ?: return
-        if (!newTarget.hasEffect(Smelly.holder))
+        if (!newTarget.hasEffect(FTMobEffectHolders.SMELLY))
             return
         event.isCanceled = true
     }
@@ -271,10 +256,8 @@ object Gameplay {
     fun tryToAttackSmelly(event: LivingIncomingDamageEvent){
         if (event.entity.level().isClientSide)
             return
-        if (!event.entity.hasEffect(Smelly.holder))
+        if (!event.entity.hasEffect(FTMobEffectHolders.SMELLY))
             return
-        val attacker = event.source.entity as? PathfinderMob ?: return
-        attacker.target = null
         event.isCanceled = true
     }
 
@@ -282,12 +265,12 @@ object Gameplay {
     fun oneMoreChance(event: LivingDeathEvent){
         if (event.entity.level().isClientSide)
             return
-        if (!event.entity.hasEffect(Scapegoat.holder))
+        if (!event.entity.hasEffect(FTMobEffectHolders.SCAPEGOAT))
             return
 
         event.isCanceled = true
         event.entity.health = event.entity.maxHealth
-        event.entity.removeEffect(Scapegoat.holder)
+        event.entity.removeEffect(FTMobEffectHolders.SCAPEGOAT)
         event.entity.addEffect(MobEffectInstance(MobEffects.DARKNESS, 20))
         if (event.entity.level().isClientSide)
             return

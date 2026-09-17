@@ -2,7 +2,9 @@ package indi.muxin.food_talks.client.ponder
 
 import indi.muxin.food_talks.FoodTalks
 import indi.muxin.food_talks.common.block.BottleBlock
+import indi.muxin.food_talks.common.block.FTBlocks
 import indi.muxin.food_talks.common.item.Cocktail
+import indi.muxin.food_talks.common.item.FTItemHolders
 import net.createmod.catnip.math.Pointing
 import net.createmod.ponder.api.registration.MultiSceneBuilder
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper
@@ -14,14 +16,10 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.Vec3
 
 fun cocktailCookbook(ps: PonderSceneRegistrationHelper<ResourceLocation>): MultiSceneBuilder = ps.forComponents(
-    ResourceLocation.fromNamespaceAndPath("minecraft", "glass_bottle"))
-    .addStoryBoard("plate/sandwich_assembly") { scene, util ->
+    FTItemHolders.GLASS_BOTTLE.key!!.location())
+    .addStoryBoard("kitchen_scene") { scene, util ->
         scene.title("scene.cocktail_assembly", "Cocktail Assembly")
         scene.configureBasePlate(0, 0, 3)
-        scene.world().setBlock(
-            BlockPos(1, 2, 1),
-            Blocks.AIR.defaultBlockState(), false)
-        scene.idle(10)
         scene.world().showSection(util.select().everywhere(), Direction.UP)
 
         scene.overlay().showText(FoodTalks.TPS)
@@ -36,7 +34,7 @@ fun cocktailCookbook(ps: PonderSceneRegistrationHelper<ResourceLocation>): Multi
             .withItem(Items.GLASS_BOTTLE.defaultInstance)
         scene.world().setBlock(
             BlockPos(1, 2, 1),
-            BottleBlock.defaultBlockState(), true)
+            FTBlocks.BOTTLE_BLOCK.defaultBlockState(), true)
         scene.idle(FoodTalks.TPS)
 
         scene.overlay().showText(4 * FoodTalks.TPS)

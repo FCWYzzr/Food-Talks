@@ -6,7 +6,7 @@ import indi.muxin.food_talks.FoodTalks
 import indi.muxin.food_talks.client.ponder.PonderForFT
 import indi.muxin.food_talks.client.renderer.Bewlr
 import indi.muxin.food_talks.client.renderer.PlateRenderer
-import indi.muxin.food_talks.common.block.PlateBlockEntity
+import indi.muxin.food_talks.common.block.FTBlockEntityTypes
 import indi.muxin.food_talks.common.item.Sandwich
 import net.createmod.ponder.foundation.PonderIndex
 import net.neoforged.api.distmarker.Dist
@@ -34,7 +34,7 @@ object FTClientLifeCycle {
 
     @SubscribeEvent
     fun registerBlockEntityRenderer(event: RegisterRenderers){
-        event.registerBlockEntityRenderer(PlateBlockEntity.type){ PlateRenderer }
+        event.registerBlockEntityRenderer(FTBlockEntityTypes.PLATE_BLOCK_ENTITY){ PlateRenderer }
     }
 
     @SubscribeEvent
