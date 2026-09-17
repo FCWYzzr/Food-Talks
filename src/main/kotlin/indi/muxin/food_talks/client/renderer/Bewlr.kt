@@ -27,8 +27,7 @@ object Bewlr: BlockEntityWithoutLevelRenderer(
                 poseStack,
                 buffer,
                 packedLight,
-                packedOverlay,
-                true
+                packedOverlay
             )
             else -> super.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
         }
