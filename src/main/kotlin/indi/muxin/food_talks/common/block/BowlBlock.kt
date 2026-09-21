@@ -76,30 +76,34 @@ class BowlBlockEntity(pos: BlockPos, blockState: BlockState): BlockEntity(FTBloc
 
     fun tipBread(breads: ItemStack) = buildItemStack(Items.BREAD) {
         val fillLevel = blockState.getValue(BowlBlock.PROPERTY_FILL_LEVEL)
-        val detail: FoodProperties = breads[DataComponents.FOOD] ?: Foods.BREAD
+        val foodData: FoodProperties = breads[DataComponents.FOOD] ?: Foods.BREAD
+        val effects: MutableMap<Holder<MobEffect>, MobEffectDetail> = mutableMapOf<Holder<MobEffect>, MobEffectDetail>().apply {
+            (breads[DataComponents.POTION_CONTENTS]?.customEffects
+                ?: listOf()).associateTo(this) { mei -> mei.effect to MobEffectDetail(mei) }
+        }
 
         val consumeNut = totalNut / fillLevel
-        val neoNut = detail.nutrition + consumeNut
+        val neoNut = foodData.nutrition + consumeNut
         totalNut -= consumeNut
 
         val consumeSat = totalSat / fillLevel
-        val neoSat = round((detail.saturation * detail.nutrition + consumeSat) / detail.saturation * 100) / 100
+        val neoSat = round((foodData.saturation * foodData.nutrition + consumeSat) / foodData.saturation * 100) / 100
         totalSat -= consumeSat
 
-        val effects = effectPool.map { (effect, detail) ->
+        effectPool.forEach { (effect, detail) ->
             val consumeDuration = detail.duration / fillLevel
             detail.duration -= consumeDuration
-            MobEffectInstance(effect, consumeDuration, detail.amplifier)
+            effects[effect] = MobEffectDetail(consumeDuration, detail.amplifier) merge effects[effect]
         }
         effectPool.filterValues { v->  v.duration == 0 }.keys.forEach { k -> effectPool.remove(k) }
 
 
         it.set(DataComponents.FOOD, FoodProperties(
             neoNut, neoSat, false,
-            detail.eatSeconds / 2, Optional.empty(), listOf()
+            foodData.eatSeconds / 2, Optional.empty(), listOf()
         ))
         it.set(DataComponents.POTION_CONTENTS, PotionContents(
-            Optional.empty(), Optional.empty(), effects
+            Optional.empty(), Optional.empty(), effects.map{(k, v) -> MobEffectDetail.instate(k, v)}
         ))
 
 
